@@ -39,10 +39,24 @@ export interface Transaction {
   createdBy: string;
 }
 
+export interface Alert {
+  id: number;
+  productId: number;
+  productSku: string;
+  productName: string;
+  resolved: boolean;
+  createdDate: string;
+  updatedDate: string;
+  createdBy: string;
+  updatedBy: string;
+}
+
 export type ProductCreate = Omit<Product, 'id'>;
 export type ProductUpdate = Partial<Product>;
 export type TransactionCreate = Omit<Transaction, 'id'>;
 export type TransactionUpdate = Partial<Transaction>;
+export type AlertCreate = Omit<Alert, 'id' | 'createdDate' | 'updatedDate'>;
+export type AlertUpdate = Partial<Omit<Alert, 'id' | 'createdDate' | 'updatedDate'>>;
 export type LowStockProduct = Product;
 
 // API service methods
@@ -109,4 +123,29 @@ export const updateTransaction = async (id: number, transaction: TransactionUpda
 
 export const deleteTransaction = async (id: number): Promise<void> => {
   await axios.delete(`${API_BASE_URL}/transactions/${id}`);
+};
+
+// Alert API methods
+export const getAlerts = async (): Promise<Alert[]> => {
+  const response = await axios.get(`${API_BASE_URL}/alerts`);
+  return response.data;
+};
+
+export const getAlert = async (id: number): Promise<Alert> => {
+  const response = await axios.get(`${API_BASE_URL}/alerts/${id}`);
+  return response.data;
+};
+
+export const createAlert = async (alert: AlertCreate): Promise<Alert> => {
+  const response = await axios.post(`${API_BASE_URL}/alerts`, alert);
+  return response.data;
+};
+
+export const updateAlert = async (id: number, alert: AlertUpdate): Promise<Alert> => {
+  const response = await axios.put(`${API_BASE_URL}/alerts/${id}`, alert);
+  return response.data;
+};
+
+export const deleteAlert = async (id: number): Promise<void> => {
+  await axios.delete(`${API_BASE_URL}/alerts/${id}`);
 };
