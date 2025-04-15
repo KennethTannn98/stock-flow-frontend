@@ -309,7 +309,7 @@ const Transactions = () => {
                     <SelectValue placeholder="All transaction types" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All</SelectItem>
+                    <SelectItem value="all">All</SelectItem>
                     <SelectItem value="IN">Stock In</SelectItem>
                     <SelectItem value="OUT">Stock Out</SelectItem>
                     <SelectItem value="ADJUSTMENT">Adjustment</SelectItem>
