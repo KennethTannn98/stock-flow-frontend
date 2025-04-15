@@ -22,10 +22,8 @@ const Sidebar = () => {
 
   const navItems = [
     { label: 'Dashboard', icon: LayoutDashboard, path: '/' },
-    { label: 'Inventory', icon: Box, path: '/inventory' },
-    { label: 'Orders', icon: ClipboardList, path: '/orders' },
-    { label: 'Suppliers', icon: PackageOpen, path: '/suppliers' },
-    { label: 'Reports', icon: TrendingUp, path: '/reports' },
+    { label: 'Products', icon: Box, path: '/Products' },
+    { label: 'Transactions', icon: ClipboardList, path: '/Transactions' },
     { label: 'Alerts', icon: AlertTriangle, path: '/alerts' },
     { label: 'Settings', icon: Settings, path: '/settings' },
   ];
@@ -77,7 +75,7 @@ const Sidebar = () => {
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-sidebar-accent flex items-center justify-center">
               <span className="font-medium text-sidebar-accent-foreground text-sm">
-                {collapsed ? 'A' : 'Admin'}
+                {collapsed ? 'A' : ''}
               </span>
             </div>
             {!collapsed && <span className="text-sm font-medium">Admin User</span>}

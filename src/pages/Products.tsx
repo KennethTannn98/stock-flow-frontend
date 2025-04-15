@@ -591,26 +591,7 @@ const Products = () => {
                                         </FormItem>
                                       )}
                                     />
-                                    <div className="grid grid-cols-2 gap-4">
-                                      <FormField
-                                        control={form.control}
-                                        name="quantity"
-                                        render={({ field }) => (
-                                          <FormItem>
-                                            <FormLabel>Quantity</FormLabel>
-                                            <FormControl>
-                                              <Input
-                                                type="number"
-                                                min="0"
-                                                step="1"
-                                                {...field}
-                                                onChange={e => field.onChange(Number(e.target.value))}
-                                              />
-                                            </FormControl>
-                                            <FormMessage />
-                                          </FormItem>
-                                        )}
-                                      />
+                                    <div className="grid grid-cols-1 gap-4">
                                       <FormField
                                         control={form.control}
                                         name="reorder"

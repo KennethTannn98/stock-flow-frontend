@@ -237,7 +237,7 @@ const Transactions = () => {
   // Format date for display
   const formatDate = (dateString: string) => {
     try {
-      return format(parseISO(dateString), 'MMM dd, yyyy HH:mm');
+      return format(parseISO(dateString), 'dd/MM/yy');
     } catch (err) {
       return dateString;
     }
@@ -306,10 +306,10 @@ const Transactions = () => {
                   onValueChange={setTypeFilter}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="All transaction types" />
+                    <SelectValue placeholder="All" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All</SelectItem>
+                    <SelectItem value="ALL">All</SelectItem>
                     <SelectItem value="IN">Stock In</SelectItem>
                     <SelectItem value="OUT">Stock Out</SelectItem>
                     <SelectItem value="ADJUSTMENT">Adjustment</SelectItem>
@@ -536,7 +536,7 @@ const Transactions = () => {
                   <FormItem>
                     <FormLabel>Transaction Date</FormLabel>
                     <FormControl>
-                      <Input type="datetime-local" {...field} />
+                      <Input type="date" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
