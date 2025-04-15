@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { Link } from 'react-router-dom';
 import {
   Package,
   Search,
@@ -12,6 +13,7 @@ import {
   X,
   Save,
   AlertCircle,
+  ExternalLink
 } from 'lucide-react';
 import AppLayout from '@/components/layout/AppLayout';
 import { Input } from '@/components/ui/input';
@@ -498,7 +500,12 @@ const Products = () => {
                     const status = getStockStatus(product);
                     return (
                       <TableRow key={product.id}>
-                        <TableCell className="font-medium">{product.name}</TableCell>
+                        <TableCell className="font-medium">
+                          <Link to={`/products/${product.id}`} className="hover:underline flex items-center gap-1">
+                            {product.name}
+                            <ExternalLink className="h-3 w-3 opacity-50" />
+                          </Link>
+                        </TableCell>
                         <TableCell>{product.sku}</TableCell>
                         <TableCell>{product.category}</TableCell>
                         <TableCell className="text-right">{product.quantity}</TableCell>
@@ -511,6 +518,11 @@ const Products = () => {
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-2">
+                            <Button variant="outline" size="icon" asChild>
+                              <Link to={`/products/${product.id}`}>
+                                <ExternalLink className="h-4 w-4" />
+                              </Link>
+                            </Button>
                             <Dialog open={!!editingProduct && editingProduct.id === product.id} onOpenChange={(open) => {
                               if (!open) setEditingProduct(null);
                               else setEditingProduct(product);

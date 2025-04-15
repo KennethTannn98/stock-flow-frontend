@@ -106,6 +106,11 @@ export const getTransactions = async (): Promise<Transaction[]> => {
   return response.data;
 };
 
+export const getProductTransactions = async (productId: number): Promise<Transaction[]> => {
+  const response = await axios.get(`${API_BASE_URL}/transactions/product/${productId}`);
+  return response.data;
+};
+
 export const getTransaction = async (id: number): Promise<Transaction> => {
   const response = await axios.get(`${API_BASE_URL}/transactions/${id}`);
   return response.data;
@@ -149,3 +154,4 @@ export const updateAlert = async (id: number, alert: AlertUpdate): Promise<Alert
 export const deleteAlert = async (id: number): Promise<void> => {
   await axios.delete(`${API_BASE_URL}/alerts/${id}`);
 };
+
