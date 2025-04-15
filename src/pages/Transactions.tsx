@@ -13,7 +13,6 @@ import {
   Search,
   Settings,
   Sliders,
-  Triangle
 } from 'lucide-react';
 
 import AppLayout from '@/components/layout/AppLayout';
@@ -68,8 +67,6 @@ import { cn } from '@/lib/utils';
 import {
   Transaction,
   TransactionCreate,
-  TransactionUpdate,
-  Product,
   getTransactions,
   getProducts,
   createTransaction,
@@ -129,7 +126,7 @@ const Transactions = () => {
 
   // Update transaction mutation
   const updateMutation = useMutation({
-    mutationFn: ({ id, transaction }: { id: number; transaction: TransactionUpdate }) => 
+    mutationFn: ({ id, transaction }: { id: number; transaction: Partial<Transaction> }) => 
       updateTransaction(id, transaction),
     onSuccess: () => {
       toast.success('Transaction updated successfully');
@@ -185,11 +182,18 @@ const Transactions = () => {
         return;
       }
 
+      // Ensure all required fields are included for TransactionCreate
       const newTransaction: TransactionCreate = {
-        ...values,
+        productId: values.productId,
+        quantity: values.quantity,
+        transactionType: values.transactionType,
+        reference: values.reference,
+        transactionDate: values.transactionDate,
+        createdBy: values.createdBy,
         productSku: selectedProduct.sku,
         productName: selectedProduct.name,
       };
+      
       createMutation.mutate(newTransaction);
     }
   };
@@ -570,3 +574,4 @@ const Transactions = () => {
 };
 
 export default Transactions;
+
