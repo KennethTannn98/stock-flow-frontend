@@ -107,7 +107,7 @@ const productToFormValues = (product?: Product): ProductFormValues => {
 
 // Available product categories
 const CATEGORIES = [
-  "GPU", "CPU", "MOBO", "RAM", "SSD", "PSU", "FAN", "CASE", "PERIPHERAL"
+  "GPU", "CPU", "MOBO", "RAM", "SSD", "PSU", "FAN", "CASE", "PERI"
 ];
 
 const Products = () => {

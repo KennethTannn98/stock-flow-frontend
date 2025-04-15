@@ -38,12 +38,12 @@ export const getDashboardStats = async (): Promise<DashboardStats> => {
 };
 
 export const getMonthlyTransactions = async (): Promise<MonthlyTransaction[]> => {
-  const response = await axios.get(`${API_BASE_URL}/monthly-transactions`);
+  const response = await axios.get(`${API_BASE_URL}/dashboard/monthly-transactions`);
   return response.data;
 };
 
 export const getLowStockProducts = async (): Promise<LowStockProduct[]> => {
-  const response = await axios.get(`${API_BASE_URL}/low-stocks`);
+  const response = await axios.get(`${API_BASE_URL}/dashboard/low-stocks`);
   return response.data;
 };
 
