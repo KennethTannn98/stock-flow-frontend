@@ -69,7 +69,9 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { 
-  Product, 
+  Product,
+  ProductCreate,
+  ProductUpdate,
   getProducts, 
   createProduct, 
   updateProduct,
@@ -124,7 +126,18 @@ const Products = () => {
 
   // Create product mutation
   const createMutation = useMutation({
-    mutationFn: createProduct,
+    mutationFn: (values: ProductFormValues) => {
+      // Ensure all required fields are present for create
+      const product: ProductCreate = {
+        name: values.name,
+        quantity: values.quantity,
+        price: values.price,
+        sku: values.sku,
+        category: values.category,
+        reorder: values.reorder,
+      };
+      return createProduct(product);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
       toast.success('Product added successfully');
@@ -137,8 +150,17 @@ const Products = () => {
 
   // Update product mutation
   const updateMutation = useMutation({
-    mutationFn: ({ id, product }: { id: number; product: Partial<Product> }) => 
-      updateProduct(id, product),
+    mutationFn: ({ id, values }: { id: number; values: ProductFormValues }) => {
+      const product: ProductUpdate = {
+        name: values.name,
+        quantity: values.quantity,
+        price: values.price,
+        sku: values.sku,
+        category: values.category,
+        reorder: values.reorder,
+      };
+      return updateProduct(id, product);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
       toast.success('Product updated successfully');
@@ -180,7 +202,7 @@ const Products = () => {
   // Handle form submit
   const onSubmit = (values: ProductFormValues) => {
     if (editingProduct) {
-      updateMutation.mutate({ id: editingProduct.id, product: values });
+      updateMutation.mutate({ id: editingProduct.id, values });
     } else {
       createMutation.mutate(values);
     }

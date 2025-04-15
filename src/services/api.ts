@@ -27,6 +27,8 @@ export interface Product {
   reorder: number;
 }
 
+export type ProductCreate = Omit<Product, 'id'>;
+export type ProductUpdate = Partial<Product>;
 export type LowStockProduct = Product;
 
 // API service methods
@@ -56,12 +58,12 @@ export const getProduct = async (id: number): Promise<Product> => {
   return response.data;
 };
 
-export const createProduct = async (product: Omit<Product, 'id'>): Promise<Product> => {
+export const createProduct = async (product: ProductCreate): Promise<Product> => {
   const response = await axios.post(`${API_BASE_URL}/products`, product);
   return response.data;
 };
 
-export const updateProduct = async (id: number, product: Partial<Product>): Promise<Product> => {
+export const updateProduct = async (id: number, product: ProductUpdate): Promise<Product> => {
   const response = await axios.put(`${API_BASE_URL}/products/${id}`, product);
   return response.data;
 };
