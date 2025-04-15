@@ -27,8 +27,22 @@ export interface Product {
   reorder: number;
 }
 
+export interface Transaction {
+  id: number;
+  productId: number;
+  productSku: string;
+  productName: string;
+  quantity: number;
+  transactionType: 'IN' | 'OUT' | 'ADJUSTMENT';
+  reference: string;
+  transactionDate: string;
+  createdBy: string;
+}
+
 export type ProductCreate = Omit<Product, 'id'>;
 export type ProductUpdate = Partial<Product>;
+export type TransactionCreate = Omit<Transaction, 'id'>;
+export type TransactionUpdate = Partial<Transaction>;
 export type LowStockProduct = Product;
 
 // API service methods
@@ -70,4 +84,29 @@ export const updateProduct = async (id: number, product: ProductUpdate): Promise
 
 export const deleteProduct = async (id: number): Promise<void> => {
   await axios.delete(`${API_BASE_URL}/products/${id}`);
+};
+
+// Transaction API methods
+export const getTransactions = async (): Promise<Transaction[]> => {
+  const response = await axios.get(`${API_BASE_URL}/transactions`);
+  return response.data;
+};
+
+export const getTransaction = async (id: number): Promise<Transaction> => {
+  const response = await axios.get(`${API_BASE_URL}/transactions/${id}`);
+  return response.data;
+};
+
+export const createTransaction = async (transaction: TransactionCreate): Promise<Transaction> => {
+  const response = await axios.post(`${API_BASE_URL}/transactions`, transaction);
+  return response.data;
+};
+
+export const updateTransaction = async (id: number, transaction: TransactionUpdate): Promise<Transaction> => {
+  const response = await axios.put(`${API_BASE_URL}/transactions/${id}`, transaction);
+  return response.data;
+};
+
+export const deleteTransaction = async (id: number): Promise<void> => {
+  await axios.delete(`${API_BASE_URL}/transactions/${id}`);
 };
