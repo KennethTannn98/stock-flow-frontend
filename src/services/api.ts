@@ -1,4 +1,3 @@
-
 import axios from 'axios';
 
 const API_BASE_URL = 'http://localhost:8080/api';
@@ -72,6 +71,12 @@ export const getMonthlyTransactions = async (): Promise<MonthlyTransaction[]> =>
 
 export const getLowStockProducts = async (): Promise<LowStockProduct[]> => {
   const response = await axios.get(`${API_BASE_URL}/dashboard/low-stocks`);
+  return response.data;
+};
+
+// New API method to fetch today's transactions
+export const getTodaysTransactions = async (): Promise<Transaction[]> => {
+  const response = await axios.get(`${API_BASE_URL}/dashboard/todays-transactions`);
   return response.data;
 };
 
@@ -154,4 +159,3 @@ export const updateAlert = async (id: number, alert: AlertUpdate): Promise<Alert
 export const deleteAlert = async (id: number): Promise<void> => {
   await axios.delete(`${API_BASE_URL}/alerts/${id}`);
 };
-
