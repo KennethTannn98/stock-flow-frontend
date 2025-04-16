@@ -1,5 +1,6 @@
-import * as React from "react"
 
+import * as React from "react"
+import { ChevronDown, ChevronUp } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const Table = React.forwardRef<
@@ -66,19 +67,32 @@ const TableRow = React.forwardRef<
 ))
 TableRow.displayName = "TableRow"
 
-const TableHead = React.forwardRef<
-  HTMLTableCellElement,
-  React.ThHTMLAttributes<HTMLTableCellElement>
->(({ className, ...props }, ref) => (
-  <th
-    ref={ref}
-    className={cn(
-      "h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0",
-      className
-    )}
-    {...props}
-  />
-))
+interface TableHeadProps extends React.ThHTMLAttributes<HTMLTableCellElement> {
+  sortable?: boolean;
+  sortDirection?: "asc" | "desc" | null;
+  onSort?: () => void;
+}
+
+const TableHead = React.forwardRef<HTMLTableCellElement, TableHeadProps>(
+  ({ className, children, sortable, sortDirection, onSort, ...props }, ref) => (
+    <th
+      ref={ref}
+      className={cn(
+        "h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0",
+        sortable && "cursor-pointer select-none",
+        className
+      )}
+      onClick={sortable ? onSort : undefined}
+      {...props}
+    >
+      <div className="flex items-center gap-1">
+        {children}
+        {sortable && sortDirection === "asc" && <ChevronUp className="h-4 w-4" />}
+        {sortable && sortDirection === "desc" && <ChevronDown className="h-4 w-4" />}
+      </div>
+    </th>
+  )
+)
 TableHead.displayName = "TableHead"
 
 const TableCell = React.forwardRef<
