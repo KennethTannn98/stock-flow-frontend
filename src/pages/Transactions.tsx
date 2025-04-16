@@ -13,6 +13,9 @@ import {
   Settings,
   Sliders,
 } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 import AppLayout from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
@@ -35,14 +38,6 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import {
   Select,
   SelectContent,
   SelectItem,
@@ -50,17 +45,6 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-import * as z from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
 import { cn } from '@/lib/utils';
 
 import {
@@ -72,6 +56,8 @@ import {
   updateTransaction,
   deleteTransaction,
 } from '@/services/api';
+import TransactionTable from '@/components/transactions/TransactionTable';
+import TransactionDialog from '@/components/transactions/TransactionDialog';
 
 // Form schema for transaction validation
 const transactionSchema = z.object({
@@ -221,22 +207,22 @@ const Transactions = () => {
 
   // Filter and search transactions
   const filteredTransactions = transactions.filter(transaction => {
-    // Apply type filter if set
-    const matchesType = !typeFilter || transaction.transactionType === typeFilter;
-    
+    // Apply type filter if set and not "ALL"
+    const matchesType = typeFilter === 'ALL' || !typeFilter || transaction.transactionType === typeFilter;
+
     // Apply search term to product name, reference, or SKU
     const matchesSearch = !searchTerm || 
       transaction.productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       transaction.reference.toLowerCase().includes(searchTerm.toLowerCase()) ||
       transaction.productSku.toLowerCase().includes(searchTerm.toLowerCase());
-    
+
     return matchesType && matchesSearch;
   });
 
   // Format date for display
   const formatDate = (dateString: string) => {
     try {
-      return format(parseISO(dateString), 'dd/MM/yy');
+      return format(parseISO(dateString), 'dd/MM/yyyy');
     } catch (err) {
       return dateString;
     }
@@ -333,241 +319,27 @@ const Transactions = () => {
 
         <Card>
           <CardContent className="p-0">
-            <div className="rounded-md border">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Product</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Quantity</TableHead>
-                    <TableHead className="hidden md:table-cell">Reference</TableHead>
-                    <TableHead className="hidden md:table-cell">Date</TableHead>
-                    <TableHead className="hidden md:table-cell">Created By</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {isLoading ? (
-                    <TableRow>
-                      <TableCell colSpan={7} className="text-center py-10">
-                        Loading transactions...
-                      </TableCell>
-                    </TableRow>
-                  ) : isError ? (
-                    <TableRow>
-                      <TableCell colSpan={7} className="text-center py-10 text-red-500">
-                        Error loading transactions: {error instanceof Error ? error.message : 'Unknown error'}
-                      </TableCell>
-                    </TableRow>
-                  ) : filteredTransactions.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={7} className="text-center py-10">
-                        No transactions found
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    filteredTransactions.map((transaction) => (
-                      <TableRow key={transaction.id}>
-                        <TableCell>
-                          <div className="font-medium">{transaction.productName}</div>
-                          <div className="text-sm text-muted-foreground">{transaction.productSku}</div>
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant="outline" className={cn("flex items-center w-fit", getTransactionBadgeColor(transaction.transactionType))}>
-                            {getTransactionIcon(transaction.transactionType)}
-                            {transaction.transactionType}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          {transaction.quantity}
-                        </TableCell>
-                        <TableCell className="hidden md:table-cell">
-                          {transaction.reference}
-                        </TableCell>
-                        <TableCell className="hidden md:table-cell">
-                          {formatDate(transaction.transactionDate)}
-                        </TableCell>
-                        <TableCell className="hidden md:table-cell">
-                          {transaction.createdBy}
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon">
-                                <MoreVertical className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                              <DropdownMenuSeparator />
-                              <DropdownMenuItem onClick={() => handleEditTransaction(transaction)}>
-                                Edit
-                              </DropdownMenuItem>
-                              <DropdownMenuItem 
-                                className="text-red-600"
-                                onClick={() => {
-                                  if (confirm('Are you sure you want to delete this transaction? This action cannot be undone.')) {
-                                    deleteMutation.mutate(transaction.id);
-                                  }
-                                }}
-                              >
-                                Delete
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
-            </div>
+            <TransactionTable
+              transactions={transactions}
+              isLoading={isLoading}
+              isError={isError}
+              error={error}
+              filteredTransactions={filteredTransactions}
+              handleEditTransaction={handleEditTransaction}
+              deleteMutation={deleteMutation}
+            />
           </CardContent>
         </Card>
       </div>
 
-      {/* Add/Edit Transaction Dialog */}
-      <Dialog open={openDialog} onOpenChange={handleDialogClose}>
-        <DialogContent className="sm:max-w-[500px]">
-          <DialogHeader>
-            <DialogTitle>
-              {editingTransaction ? 'Edit Transaction' : 'Add New Transaction'}
-            </DialogTitle>
-            <DialogDescription>
-              {editingTransaction 
-                ? 'Update the details of the existing transaction.' 
-                : 'Create a new inventory transaction.'}
-            </DialogDescription>
-          </DialogHeader>
-
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="productId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Product</FormLabel>
-                    <Select
-                      disabled={Boolean(editingTransaction)}
-                      onValueChange={(value) => field.onChange(Number(value))}
-                      value={field.value.toString()}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select product" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {products.map((product) => (
-                          <SelectItem key={product.id} value={product.id.toString()}>
-                            {product.name} ({product.sku})
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="transactionType"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Transaction Type</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select type" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="IN">Stock In</SelectItem>
-                        <SelectItem value="OUT">Stock Out</SelectItem>
-                        <SelectItem value="ADJUSTMENT">Adjustment</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="quantity"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Quantity</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        min="1"
-                        placeholder="Enter quantity"
-                        {...field}
-                        onChange={(e) => field.onChange(Number(e.target.value))}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="reference"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Reference</FormLabel>
-                    <FormControl>
-                      <Input placeholder="e.g., PO12345, SO6789" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="transactionDate"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Transaction Date</FormLabel>
-                    <FormControl>
-                      <Input type="date" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="createdBy"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Created By</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Username" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <DialogFooter>
-                <Button type="button" variant="outline" onClick={handleDialogClose}>
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={createMutation.isPending || updateMutation.isPending}>
-                  {createMutation.isPending || updateMutation.isPending ? 'Saving...' : 'Save'}
-                </Button>
-              </DialogFooter>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
+      <TransactionDialog
+        open={openDialog}
+        onClose={handleDialogClose}
+        onSubmit={onSubmit}
+        form={form}
+        products={products}
+        isEditing={!!editingTransaction}
+      />
     </AppLayout>
   );
 };
