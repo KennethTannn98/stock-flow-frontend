@@ -31,6 +31,8 @@ const Transactions = () => {
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState('');
   const [typeFilter, setTypeFilter] = useState<string>('');
+  const [startDate, setStartDate] = useState<string>('');
+  const [endDate, setEndDate] = useState<string>('');
   const [openDialog, setOpenDialog] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
   
@@ -139,6 +141,14 @@ const Transactions = () => {
     }
   };
 
+  // Reset all filters
+  const handleResetFilters = () => {
+    setSearchTerm('');
+    setTypeFilter('');
+    setStartDate('');
+    setEndDate('');
+  };
+
   // Filter transactions
   const filteredTransactions = transactions.filter(transaction => {
     // Apply type filter if set
@@ -150,7 +160,23 @@ const Transactions = () => {
       transaction.reference.toLowerCase().includes(searchTerm.toLowerCase()) ||
       transaction.productSku.toLowerCase().includes(searchTerm.toLowerCase());
     
-    return matchesType && matchesSearch;
+    // Apply date filters
+    let matchesDates = true;
+    if (startDate) {
+      const transactionDate = new Date(transaction.transactionDate);
+      const filterStartDate = new Date(startDate);
+      filterStartDate.setHours(0, 0, 0, 0);
+      matchesDates = matchesDates && transactionDate >= filterStartDate;
+    }
+    
+    if (endDate) {
+      const transactionDate = new Date(transaction.transactionDate);
+      const filterEndDate = new Date(endDate);
+      filterEndDate.setHours(23, 59, 59, 999);
+      matchesDates = matchesDates && transactionDate <= filterEndDate;
+    }
+    
+    return matchesType && matchesSearch && matchesDates;
   });
 
   return (
@@ -166,12 +192,13 @@ const Transactions = () => {
         <TransactionFilters 
           searchTerm={searchTerm}
           typeFilter={typeFilter}
+          startDate={startDate}
+          endDate={endDate}
           onSearchChange={setSearchTerm}
           onTypeFilterChange={setTypeFilter}
-          onResetFilters={() => {
-            setSearchTerm('');
-            setTypeFilter('');
-          }}
+          onStartDateChange={setStartDate}
+          onEndDateChange={setEndDate}
+          onResetFilters={handleResetFilters}
         />
 
         <Card>

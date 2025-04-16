@@ -14,16 +14,24 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 interface TransactionFiltersProps {
   searchTerm: string;
   typeFilter: string;
+  startDate: string;
+  endDate: string;
   onSearchChange: (value: string) => void;
   onTypeFilterChange: (value: string) => void;
+  onStartDateChange: (value: string) => void;
+  onEndDateChange: (value: string) => void;
   onResetFilters: () => void;
 }
 
 export default function TransactionFilters({ 
   searchTerm, 
-  typeFilter, 
+  typeFilter,
+  startDate,
+  endDate,
   onSearchChange, 
-  onTypeFilterChange, 
+  onTypeFilterChange,
+  onStartDateChange,
+  onEndDateChange,
   onResetFilters 
 }: TransactionFiltersProps) {
   return (
@@ -32,7 +40,7 @@ export default function TransactionFilters({
         <CardTitle className="text-lg">Filters</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
             <label className="text-sm font-medium mb-1 block text-muted-foreground">Search</label>
             <div className="relative">
@@ -45,6 +53,7 @@ export default function TransactionFilters({
               />
             </div>
           </div>
+          
           <div>
             <label className="text-sm font-medium mb-1 block text-muted-foreground">Type</label>
             <Select 
@@ -62,7 +71,28 @@ export default function TransactionFilters({
               </SelectContent>
             </Select>
           </div>
-          <div className="flex items-end">
+          
+          <div>
+            <label className="text-sm font-medium mb-1 block text-muted-foreground">From Date</label>
+            <Input 
+              type="date" 
+              value={startDate}
+              onChange={(e) => onStartDateChange(e.target.value)}
+              className="h-10"
+            />
+          </div>
+          
+          <div>
+            <label className="text-sm font-medium mb-1 block text-muted-foreground">To Date</label>
+            <Input 
+              type="date" 
+              value={endDate}
+              onChange={(e) => onEndDateChange(e.target.value)}
+              className="h-10"
+            />
+          </div>
+          
+          <div className="flex items-end md:col-span-4 justify-end">
             <Button 
               variant="outline" 
               onClick={onResetFilters}

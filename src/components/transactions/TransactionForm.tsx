@@ -57,6 +57,16 @@ export default function TransactionForm({
   initialValues,
   isSubmitting
 }: TransactionFormProps) {
+  // Format date for input field (YYYY-MM-DD)
+  const formatDateForInput = (dateString: string) => {
+    try {
+      const date = new Date(dateString);
+      return date.toISOString().split('T')[0];
+    } catch (e) {
+      return new Date().toISOString().split('T')[0];
+    }
+  };
+
   // Form setup with default values
   const form = useForm<TransactionFormValues>({
     resolver: zodResolver(transactionSchema),
@@ -66,8 +76,8 @@ export default function TransactionForm({
       transactionType: (initialValues?.transactionType as 'IN' | 'OUT' | 'ADJUSTMENT') || 'IN',
       reference: initialValues?.reference || '',
       transactionDate: initialValues?.transactionDate ? 
-        new Date(initialValues.transactionDate).toISOString().slice(0, 16) : 
-        new Date().toISOString().slice(0, 16),
+        formatDateForInput(initialValues.transactionDate) : 
+        formatDateForInput(new Date().toISOString()),
       createdBy: initialValues?.createdBy || 'admin',
     },
   });
