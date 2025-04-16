@@ -342,7 +342,7 @@ const Transactions = () => {
                     <TableHead>Type</TableHead>
                     <TableHead>Quantity</TableHead>
                     <TableHead className="hidden md:table-cell">Reference</TableHead>
-                    <TableHead className="hidden md:table-cell">Transaction Date</TableHead>
+                    <TableHead className="hidden md:table-cell">Date</TableHead>
                     <TableHead className="hidden md:table-cell">Created By</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
