@@ -12,9 +12,7 @@ import {
   Clock,
   X,
   Check,
-  Trash2,
-  ChevronUp,
-  ChevronDown
+  Trash2
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Alert, getAlerts, updateAlert, deleteAlert, createAlert, AlertCreate, AlertUpdate } from '@/services/api';
@@ -59,24 +57,9 @@ import {
   FormItem,
   FormLabel,
 } from '@/components/ui/form';
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from '@/components/ui/pagination';
 import { useForm } from 'react-hook-form';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-
-// Number of items to display per page
-const ITEMS_PER_PAGE = 10;
-
-type SortField = 'productName' | 'productSku' | 'createdDate' | 'updatedDate' | 'resolved' | null;
-type SortDirection = 'asc' | 'desc';
 
 const Alerts = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -84,13 +67,6 @@ const Alerts = () => {
   const [selectedAlert, setSelectedAlert] = useState<Alert | null>(null);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  
-  // Sorting state
-  const [sortField, setSortField] = useState<SortField>(null);
-  const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
-  
-  // Pagination state
-  const [currentPage, setCurrentPage] = useState(1);
 
   const queryClient = useQueryClient();
 
@@ -176,18 +152,7 @@ const Alerts = () => {
     }
   };
 
-  // Handle sorting
-  const handleSort = (field: SortField) => {
-    if (sortField === field) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortField(field);
-      setSortDirection('asc');
-    }
-    setCurrentPage(1); // Reset to first page when sorting
-  };
-
-  // Filter and sort alerts based on search query, status filter and sort
+  // Filter alerts based on search query and status filter
   const filteredAlerts = alerts.filter((alert) => {
     const matchesSearch = 
       alert.productName.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -198,76 +163,7 @@ const Alerts = () => {
     if (statusFilter === 'unresolved') return matchesSearch && !alert.resolved;
     
     return matchesSearch;
-  }).sort((a, b) => {
-    if (!sortField) return 0;
-    
-    const modifier = sortDirection === 'asc' ? 1 : -1;
-    
-    switch (sortField) {
-      case 'productName':
-        return a.productName.localeCompare(b.productName) * modifier;
-      case 'productSku':
-        return a.productSku.localeCompare(b.productSku) * modifier;
-      case 'createdDate':
-        return new Date(a.createdDate).getTime() - new Date(b.createdDate).getTime() * modifier;
-      case 'updatedDate':
-        return new Date(a.updatedDate).getTime() - new Date(b.updatedDate).getTime() * modifier;
-      case 'resolved':
-        return (Number(a.resolved) - Number(b.resolved)) * modifier;
-      default:
-        return 0;
-    }
   });
-  
-  // Calculate pagination
-  const totalPages = Math.ceil(filteredAlerts.length / ITEMS_PER_PAGE);
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const paginatedAlerts = filteredAlerts.slice(startIndex, startIndex + ITEMS_PER_PAGE);
-  
-  // Generate page numbers for pagination
-  const getPageNumbers = () => {
-    const pageNumbers = [];
-    const maxPagesToShow = 5;
-    
-    if (totalPages <= maxPagesToShow) {
-      // Show all pages if total pages are less than max pages to show
-      for (let i = 1; i <= totalPages; i++) {
-        pageNumbers.push(i);
-      }
-    } else {
-      // Always include first page
-      pageNumbers.push(1);
-      
-      // Calculate middle pages
-      if (currentPage <= 3) {
-        for (let i = 2; i <= 4; i++) {
-          if (i <= totalPages) pageNumbers.push(i);
-        }
-      } else if (currentPage >= totalPages - 2) {
-        for (let i = totalPages - 3; i <= totalPages - 1; i++) {
-          if (i > 1) pageNumbers.push(i);
-        }
-      } else {
-        pageNumbers.push(currentPage - 1, currentPage, currentPage + 1);
-      }
-      
-      // Always include last page
-      if (!pageNumbers.includes(totalPages)) {
-        pageNumbers.push(totalPages);
-      }
-    }
-    
-    // Add ellipsis indicators
-    const result = [];
-    for (let i = 0; i < pageNumbers.length; i++) {
-      if (i > 0 && pageNumbers[i] - pageNumbers[i - 1] > 1) {
-        result.push(-1); // -1 represents an ellipsis
-      }
-      result.push(pageNumbers[i]);
-    }
-    
-    return result;
-  };
 
   // Format date for display
   const formatDate = (dateString: string) => {
@@ -297,20 +193,14 @@ const Alerts = () => {
               placeholder="Search alerts..."
               className="pl-8"
               value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value);
-                setCurrentPage(1); // Reset to first page on search
-              }}
+              onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
           <div className="flex items-center space-x-2">
             <Filter className="h-4 w-4 text-muted-foreground" />
             <Select
               value={statusFilter}
-              onValueChange={(value) => {
-                setStatusFilter(value);
-                setCurrentPage(1); // Reset to first page on filter change
-              }}
+              onValueChange={setStatusFilter}
             >
               <SelectTrigger className="w-40">
                 <SelectValue placeholder="Filter by status" />
@@ -328,51 +218,11 @@ const Alerts = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead 
-                  className="cursor-pointer"
-                  onClick={() => handleSort('resolved')}
-                >
-                  Status
-                  {sortField === 'resolved' && (
-                    sortDirection === 'asc' ? <ChevronUp className="inline h-4 w-4 ml-1" /> : <ChevronDown className="inline h-4 w-4 ml-1" />
-                  )}
-                </TableHead>
-                <TableHead 
-                  className="cursor-pointer"
-                  onClick={() => handleSort('productName')}
-                >
-                  Product
-                  {sortField === 'productName' && (
-                    sortDirection === 'asc' ? <ChevronUp className="inline h-4 w-4 ml-1" /> : <ChevronDown className="inline h-4 w-4 ml-1" />
-                  )}
-                </TableHead>
-                <TableHead 
-                  className="cursor-pointer"
-                  onClick={() => handleSort('productSku')}
-                >
-                  SKU
-                  {sortField === 'productSku' && (
-                    sortDirection === 'asc' ? <ChevronUp className="inline h-4 w-4 ml-1" /> : <ChevronDown className="inline h-4 w-4 ml-1" />
-                  )}
-                </TableHead>
-                <TableHead 
-                  className="hidden md:table-cell cursor-pointer"
-                  onClick={() => handleSort('createdDate')}
-                >
-                  Created
-                  {sortField === 'createdDate' && (
-                    sortDirection === 'asc' ? <ChevronUp className="inline h-4 w-4 ml-1" /> : <ChevronDown className="inline h-4 w-4 ml-1" />
-                  )}
-                </TableHead>
-                <TableHead 
-                  className="hidden md:table-cell cursor-pointer"
-                  onClick={() => handleSort('updatedDate')}
-                >
-                  Updated
-                  {sortField === 'updatedDate' && (
-                    sortDirection === 'asc' ? <ChevronUp className="inline h-4 w-4 ml-1" /> : <ChevronDown className="inline h-4 w-4 ml-1" />
-                  )}
-                </TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Product</TableHead>
+                <TableHead>SKU</TableHead>
+                <TableHead className="hidden md:table-cell">Created</TableHead>
+                <TableHead className="hidden md:table-cell">Updated</TableHead>
                 <TableHead className="hidden md:table-cell">Created By</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
@@ -384,14 +234,14 @@ const Alerts = () => {
                     Loading alerts...
                   </TableCell>
                 </TableRow>
-              ) : paginatedAlerts.length === 0 ? (
+              ) : filteredAlerts.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={7} className="h-24 text-center">
                     No alerts found.
                   </TableCell>
                 </TableRow>
               ) : (
-                paginatedAlerts.map((alert) => (
+                filteredAlerts.map((alert) => (
                   <TableRow key={alert.id}>
                     <TableCell>
                       <Badge 
@@ -467,46 +317,6 @@ const Alerts = () => {
               )}
             </TableBody>
           </Table>
-          
-          {totalPages > 1 && (
-            <div className="flex items-center justify-between border-t p-4">
-              <div className="text-sm text-muted-foreground">
-                Showing {startIndex + 1} to {Math.min(startIndex + ITEMS_PER_PAGE, filteredAlerts.length)} of {filteredAlerts.length} entries
-              </div>
-              <Pagination>
-                <PaginationContent>
-                  <PaginationItem>
-                    <PaginationPrevious 
-                      onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                      className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                    />
-                  </PaginationItem>
-                  
-                  {getPageNumbers().map((pageNum, index) => (
-                    <PaginationItem key={index}>
-                      {pageNum === -1 ? (
-                        <PaginationEllipsis />
-                      ) : (
-                        <PaginationLink
-                          isActive={currentPage === pageNum}
-                          onClick={() => setCurrentPage(pageNum)}
-                        >
-                          {pageNum}
-                        </PaginationLink>
-                      )}
-                    </PaginationItem>
-                  ))}
-                  
-                  <PaginationItem>
-                    <PaginationNext 
-                      onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                      className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                    />
-                  </PaginationItem>
-                </PaginationContent>
-              </Pagination>
-            </div>
-          )}
         </div>
       </div>
 
