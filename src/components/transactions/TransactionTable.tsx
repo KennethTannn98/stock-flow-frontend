@@ -189,56 +189,80 @@ export default function TransactionTable({
               <TableHead 
                 className="cursor-pointer"
                 onClick={() => handleSort('productName')}
-                sortable
-                sortDirection={sortField === 'productName' ? sortDirection : null}
-                onSort={() => handleSort('productName')}
               >
-                Product
+                <div className="flex items-center gap-1">
+                  Product
+                  {sortField === 'productName' && (
+                    sortDirection === 'asc' ? 
+                    <ChevronUp className="h-4 w-4" /> : 
+                    <ChevronDown className="h-4 w-4" />
+                  )}
+                </div>
               </TableHead>
               <TableHead 
                 className="cursor-pointer"
                 onClick={() => handleSort('transactionType')}
-                sortable
-                sortDirection={sortField === 'transactionType' ? sortDirection : null}
-                onSort={() => handleSort('transactionType')}
               >
-                Type
+                <div className="flex items-center gap-1">
+                  Type
+                  {sortField === 'transactionType' && (
+                    sortDirection === 'asc' ? 
+                    <ChevronUp className="h-4 w-4" /> : 
+                    <ChevronDown className="h-4 w-4" />
+                  )}
+                </div>
               </TableHead>
               <TableHead
                 className="cursor-pointer"
                 onClick={() => handleSort('quantity')}
-                sortable
-                sortDirection={sortField === 'quantity' ? sortDirection : null}
-                onSort={() => handleSort('quantity')}
               >
-                Quantity
+                <div className="flex items-center gap-1">
+                  Quantity
+                  {sortField === 'quantity' && (
+                    sortDirection === 'asc' ? 
+                    <ChevronUp className="h-4 w-4" /> : 
+                    <ChevronDown className="h-4 w-4" />
+                  )}
+                </div>
               </TableHead>
               <TableHead 
                 className="hidden md:table-cell cursor-pointer"
                 onClick={() => handleSort('reference')}
-                sortable
-                sortDirection={sortField === 'reference' ? sortDirection : null}
-                onSort={() => handleSort('reference')}
               >
-                Reference
+                <div className="flex items-center gap-1">
+                  Reference
+                  {sortField === 'reference' && (
+                    sortDirection === 'asc' ? 
+                    <ChevronUp className="h-4 w-4" /> : 
+                    <ChevronDown className="h-4 w-4" />
+                  )}
+                </div>
               </TableHead>
               <TableHead 
                 className="hidden md:table-cell cursor-pointer"
                 onClick={() => handleSort('transactionDate')}
-                sortable
-                sortDirection={sortField === 'transactionDate' ? sortDirection : null}
-                onSort={() => handleSort('transactionDate')}
               >
-                Transaction Date
+                <div className="flex items-center gap-1">
+                  Transaction Date
+                  {sortField === 'transactionDate' && (
+                    sortDirection === 'asc' ? 
+                    <ChevronUp className="h-4 w-4" /> : 
+                    <ChevronDown className="h-4 w-4" />
+                  )}
+                </div>
               </TableHead>
               <TableHead 
                 className="hidden md:table-cell cursor-pointer"
                 onClick={() => handleSort('createdBy')}
-                sortable
-                sortDirection={sortField === 'createdBy' ? sortDirection : null}
-                onSort={() => handleSort('createdBy')}
               >
-                Created By
+                <div className="flex items-center gap-1">
+                  Created By
+                  {sortField === 'createdBy' && (
+                    sortDirection === 'asc' ? 
+                    <ChevronUp className="h-4 w-4" /> : 
+                    <ChevronDown className="h-4 w-4" />
+                  )}
+                </div>
               </TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
