@@ -80,7 +80,7 @@ type SortDirection = 'asc' | 'desc';
 
 const Alerts = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState("unresolved");
+  const [statusFilter, setStatusFilter] = useState<string>('all');
   const [selectedAlert, setSelectedAlert] = useState<Alert | null>(null);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -272,7 +272,7 @@ const Alerts = () => {
   // Format date for display
   const formatDate = (dateString: string) => {
     try {
-      return format(parseISO(dateString), 'dd/MM/yy');
+      return format(parseISO(dateString), 'MMM d, yyyy h:mm a');
     } catch (e) {
       return dateString;
     }
@@ -316,9 +316,9 @@ const Alerts = () => {
                 <SelectValue placeholder="Filter by status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="unresolved">Unresolved</SelectItem>
-                <SelectItem value="resolved">Resolved</SelectItem>
                 <SelectItem value="all">All Alerts</SelectItem>
+                <SelectItem value="resolved">Resolved</SelectItem>
+                <SelectItem value="unresolved">Unresolved</SelectItem>
               </SelectContent>
             </Select>
           </div>

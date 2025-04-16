@@ -518,6 +518,11 @@ const Products = () => {
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-2">
+                            <Button variant="outline" size="icon" asChild>
+                              <Link to={`/products/${product.id}`}>
+                                <ExternalLink className="h-4 w-4" />
+                              </Link>
+                            </Button>
                             <Dialog open={!!editingProduct && editingProduct.id === product.id} onOpenChange={(open) => {
                               if (!open) setEditingProduct(null);
                               else setEditingProduct(product);
