@@ -100,6 +100,7 @@ const ProductDialog = ({ open, onClose, onSubmit, form, categories, isEditing })
                         min="0"
                         step="1"
                         {...field}
+                        disabled={isEditing}
                         onChange={e => field.onChange(Number(e.target.value))}
                       />
                     </FormControl>

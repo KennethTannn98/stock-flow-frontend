@@ -4,13 +4,22 @@ import { format, parseISO } from 'date-fns';
 import { 
   Search, 
   Plus, 
-  Filter
+  Filter,
+  RefreshCcw,
+  Bell
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Alert, getAlerts, updateAlert, deleteAlert, createAlert, AlertCreate, AlertUpdate } from '@/services/api';
 import AppLayout from '@/components/layout/AppLayout';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import {
   Select,
   SelectContent,
@@ -129,7 +138,7 @@ const Alerts = () => {
   // Format date for display
   const formatDate = (dateString: string) => {
     try {
-      return format(parseISO(dateString), 'dd/mm/yyyy');
+      return format(parseISO(dateString), 'dd/MM/yyyy');
     } catch (e) {
       return dateString;
     }
@@ -137,53 +146,80 @@ const Alerts = () => {
 
   return (
     <AppLayout>
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-3xl font-bold tracking-tight">Alerts</h2>
+      <div className="container mx-auto px-4 py-6">
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h1 className="text-2xl font-semibold">Alerts</h1>
+            <p className="text-muted-foreground">Monitor and manage inventory alerts</p>
+          </div>
           <Button onClick={() => setIsAddDialogOpen(true)}>
-            <Plus className="mr-2 h-4 w-4" />
-            Add Alert
+            <Plus className="h-4 w-4 mr-2" /> Add Alert
           </Button>
         </div>
 
-        <div className="flex flex-col md:flex-row gap-4 md:items-center">
-          <div className="relative w-full md:w-64">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Search alerts..."
-              className="pl-8"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-          <div className="flex items-center space-x-2">
-            <Filter className="h-4 w-4 text-muted-foreground" />
-            <Select
-              value={statusFilter}
-              onValueChange={setStatusFilter}
-            >
-              <SelectTrigger className="w-40">
-                <SelectValue placeholder="Filter by status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="unresolved">Unresolved</SelectItem>
-                <SelectItem value="resolved">Resolved</SelectItem>
-                <SelectItem value="all">All Alerts</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
+        <Card className="mb-6">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg">Filters</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="text-sm font-medium mb-1 block text-muted-foreground">Search</label>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search alerts..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-9"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="text-sm font-medium mb-1 block text-muted-foreground">Status</label>
+                <Select
+                  value={statusFilter}
+                  onValueChange={setStatusFilter}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Filter by status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="unresolved">Unresolved</SelectItem>
+                    <SelectItem value="resolved">Resolved</SelectItem>
+                    <SelectItem value="all">All Alerts</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex items-end">
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    setSearchQuery('');
+                    setStatusFilter('unresolved');
+                  }}
+                  className="h-10"
+                >
+                  <RefreshCcw className="h-4 w-4 mr-2" /> Reset Filters
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
-        <AlertTable
-          alerts={alerts}
-          isLoading={isLoading}
-          filteredAlerts={filteredAlerts}
-          formatDate={formatDate}
-          handleToggleResolved={handleToggleResolved}
-          setSelectedAlert={setSelectedAlert}
-          setIsDeleteDialogOpen={setIsDeleteDialogOpen}
-        />
+        <Card>
+          <CardContent className="p-0">
+            <AlertTable
+              alerts={alerts}
+              isLoading={isLoading}
+              filteredAlerts={filteredAlerts}
+              formatDate={formatDate}
+              handleToggleResolved={handleToggleResolved}
+              setSelectedAlert={setSelectedAlert}
+              setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+            />
+          </CardContent>
+        </Card>
       </div>
 
       <AlertDialog

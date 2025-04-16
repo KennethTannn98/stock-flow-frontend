@@ -17,6 +17,9 @@ import {
   Trash2,
   X,
   Check,
+  ArrowUp,
+  ArrowDown,
+  ArrowUpDown,
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -32,6 +35,7 @@ import {
   PaginationPrevious,
   PaginationNext,
 } from '@/components/ui/pagination';
+import { cn } from '@/lib/utils';
 
 const AlertTable = ({ alerts, isLoading, filteredAlerts, formatDate, handleToggleResolved, setSelectedAlert, setIsDeleteDialogOpen }) => {
   const [currentPage, setCurrentPage] = useState(0);
@@ -49,6 +53,13 @@ const AlertTable = ({ alerts, isLoading, filteredAlerts, formatDate, handleToggl
     setSortConfig({ key, direction });
   };
 
+  const getSortIcon = (key) => {
+    if (sortConfig.key !== key) return <ArrowUpDown className="ml-2 h-4 w-4" />;
+    return sortConfig.direction === 'asc' 
+      ? <ArrowUp className="ml-2 h-4 w-4" /> 
+      : <ArrowDown className="ml-2 h-4 w-4" />;
+  };
+
   const sortedAlerts = [...paginatedAlerts].sort((a, b) => {
     if (sortConfig.key) {
       const aValue = a[sortConfig.key];
@@ -64,25 +75,67 @@ const AlertTable = ({ alerts, isLoading, filteredAlerts, formatDate, handleToggl
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead onClick={() => handleSort('resolved')}>Status</TableHead>
-            <TableHead onClick={() => handleSort('productName')}>Product</TableHead>
-            <TableHead onClick={() => handleSort('productSku')}>SKU</TableHead>
-            <TableHead onClick={() => handleSort('createdDate')} className="hidden md:table-cell">Created</TableHead>
-            <TableHead onClick={() => handleSort('updatedDate')} className="hidden md:table-cell">Updated</TableHead>
-            <TableHead onClick={() => handleSort('createdBy')} className="hidden md:table-cell">Created By</TableHead>
-            <TableHead>Actions</TableHead>
+            <TableHead 
+              onClick={() => handleSort('resolved')}
+              className="cursor-pointer hover:bg-muted"
+            >
+              <div className="flex items-center">
+                Status {getSortIcon('resolved')}
+              </div>
+            </TableHead>
+            <TableHead 
+              onClick={() => handleSort('productName')}
+              className="cursor-pointer hover:bg-muted"
+            >
+              <div className="flex items-center">
+                Product {getSortIcon('productName')}
+              </div>
+            </TableHead>
+            <TableHead 
+              onClick={() => handleSort('productSku')}
+              className="cursor-pointer hover:bg-muted"
+            >
+              <div className="flex items-center">
+                SKU {getSortIcon('productSku')}
+              </div>
+            </TableHead>
+            <TableHead 
+              onClick={() => handleSort('createdDate')}
+              className="hidden md:table-cell cursor-pointer hover:bg-muted"
+            >
+              <div className="flex items-center">
+                Created {getSortIcon('createdDate')}
+              </div>
+            </TableHead>
+            <TableHead 
+              onClick={() => handleSort('updatedDate')}
+              className="hidden md:table-cell cursor-pointer hover:bg-muted"
+            >
+              <div className="flex items-center">
+                Updated {getSortIcon('updatedDate')}
+              </div>
+            </TableHead>
+            <TableHead 
+              onClick={() => handleSort('createdBy')}
+              className="hidden md:table-cell cursor-pointer hover:bg-muted"
+            >
+              <div className="flex items-center">
+                Created By {getSortIcon('createdBy')}
+              </div>
+            </TableHead>
+            <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {isLoading ? (
             <TableRow>
-              <TableCell colSpan={7} className="h-24 text-center">
+              <TableCell colSpan={7} className="text-center py-10">
                 Loading alerts...
               </TableCell>
             </TableRow>
           ) : sortedAlerts.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={7} className="h-24 text-center">
+              <TableCell colSpan={7} className="text-center py-10">
                 No alerts found.
               </TableCell>
             </TableRow>
@@ -92,7 +145,7 @@ const AlertTable = ({ alerts, isLoading, filteredAlerts, formatDate, handleToggl
                 <TableCell>
                   <Badge 
                     variant={alert.resolved ? "outline" : "destructive"}
-                    className="gap-1"
+                    className="flex items-center gap-1 w-fit"
                   >
                     {alert.resolved ? (
                       <>
@@ -107,7 +160,7 @@ const AlertTable = ({ alerts, isLoading, filteredAlerts, formatDate, handleToggl
                     )}
                   </Badge>
                 </TableCell>
-                <TableCell>{alert.productName}</TableCell>
+                <TableCell className="font-medium">{alert.productName}</TableCell>
                 <TableCell>{alert.productSku}</TableCell>
                 <TableCell className="hidden md:table-cell">
                   <div className="flex items-center gap-1">
@@ -122,7 +175,7 @@ const AlertTable = ({ alerts, isLoading, filteredAlerts, formatDate, handleToggl
                   </div>
                 </TableCell>
                 <TableCell className="hidden md:table-cell">{alert.createdBy}</TableCell>
-                <TableCell>
+                <TableCell className="text-right">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" size="icon">
@@ -132,27 +185,28 @@ const AlertTable = ({ alerts, isLoading, filteredAlerts, formatDate, handleToggl
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem 
                         onClick={() => handleToggleResolved(alert)}
+                        className="gap-2"
                       >
                         {alert.resolved ? (
                           <>
-                            <X className="mr-2 h-4 w-4" />
+                            <X className="h-4 w-4" />
                             Mark as Unresolved
                           </>
                         ) : (
                           <>
-                            <Check className="mr-2 h-4 w-4" />
+                            <Check className="h-4 w-4" />
                             Mark as Resolved
                           </>
                         )}
                       </DropdownMenuItem>
                       <DropdownMenuItem
-                        className="text-destructive focus:text-destructive"
+                        className="text-destructive focus:text-destructive gap-2"
                         onClick={() => {
                           setSelectedAlert(alert);
                           setIsDeleteDialogOpen(true);
                         }}
                       >
-                        <Trash2 className="mr-2 h-4 w-4" />
+                        <Trash2 className="h-4 w-4" />
                         Delete
                       </DropdownMenuItem>
                     </DropdownMenuContent>
@@ -163,7 +217,7 @@ const AlertTable = ({ alerts, isLoading, filteredAlerts, formatDate, handleToggl
           )}
         </TableBody>
       </Table>
-      <Pagination className="mt-4">
+      <Pagination className="mt-2 pb-4">
         <PaginationPrevious
           onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 0))}
         />

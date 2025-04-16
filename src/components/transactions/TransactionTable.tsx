@@ -3,7 +3,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { MoreVertical, ArrowDown, ArrowUp, Sliders } from 'lucide-react';
+import { MoreVertical, ArrowDown, ArrowUp, Sliders, ArrowUpDown } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationPrevious, PaginationNext } from '@/components/ui/pagination';
@@ -58,6 +58,13 @@ const TransactionTable = ({ transactions, isLoading, isError, error, filteredTra
     setSortConfig({ key, direction });
   };
 
+  const getSortIcon = (key) => {
+    if (sortConfig.key !== key) return <ArrowUpDown className="ml-2 h-4 w-4" />;
+    return sortConfig.direction === 'asc' 
+      ? <ArrowUp className="ml-2 h-4 w-4" /> 
+      : <ArrowDown className="ml-2 h-4 w-4" />;
+  };
+
   const sortedTransactions = [...paginatedTransactions].sort((a, b) => {
     if (sortConfig.key) {
       const aValue = a[sortConfig.key];
@@ -73,12 +80,54 @@ const TransactionTable = ({ transactions, isLoading, isError, error, filteredTra
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead onClick={() => handleSort('productName')}>Product</TableHead>
-            <TableHead onClick={() => handleSort('transactionType')}>Type</TableHead>
-            <TableHead onClick={() => handleSort('quantity')}>Quantity</TableHead>
-            <TableHead onClick={() => handleSort('reference')} className="hidden md:table-cell">Reference</TableHead>
-            <TableHead onClick={() => handleSort('transactionDate')} className="hidden md:table-cell">Transaction Date</TableHead>
-            <TableHead onClick={() => handleSort('createdBy')} className="hidden md:table-cell">Created By</TableHead>
+            <TableHead 
+              onClick={() => handleSort('productName')}
+              className="cursor-pointer hover:bg-muted"
+            >
+              <div className="flex items-center">
+                Product {getSortIcon('productName')}
+              </div>
+            </TableHead>
+            <TableHead 
+              onClick={() => handleSort('transactionType')}
+              className="cursor-pointer hover:bg-muted"
+            >
+              <div className="flex items-center">
+                Type {getSortIcon('transactionType')}
+              </div>
+            </TableHead>
+            <TableHead 
+              onClick={() => handleSort('quantity')}
+              className="cursor-pointer hover:bg-muted"
+            >
+              <div className="flex items-center">
+                Quantity {getSortIcon('quantity')}
+              </div>
+            </TableHead>
+            <TableHead 
+              onClick={() => handleSort('reference')}
+              className="hidden md:table-cell cursor-pointer hover:bg-muted"
+            >
+              <div className="flex items-center">
+                Reference {getSortIcon('reference')}
+              </div>
+            </TableHead>
+            <TableHead 
+              onClick={() => handleSort('transactionDate')}
+              className="hidden md:table-cell cursor-pointer hover:bg-muted"
+            >
+              <div className="flex items-center">
+                Transaction Date {getSortIcon('transactionDate')}
+              </div>
+            </TableHead>
+            <TableHead 
+              onClick={() => handleSort('createdBy')}
+              className="hidden md:table-cell cursor-pointer hover:bg-muted"
+            >
+              <div className="flex items-center">
+                Created By {getSortIcon('createdBy')}
+              </div>
+            </TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -157,7 +206,7 @@ const TransactionTable = ({ transactions, isLoading, isError, error, filteredTra
           )}
         </TableBody>
       </Table>
-      <Pagination className="mt-4">
+      <Pagination className="mt-2 pb-4">
         <PaginationPrevious
           onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 0))}
         />

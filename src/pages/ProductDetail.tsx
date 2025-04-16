@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useParams, useNavigate, Link } from 'react-router-dom';
@@ -257,25 +256,27 @@ const ProductDetail = () => {
   if (productError) {
     return (
       <AppLayout>
-        <div className="flex flex-col items-center justify-center py-12">
-          <div className="rounded-full bg-destructive/10 p-3 mb-4">
-            <AlertCircle className="h-8 w-8 text-destructive" />
-          </div>
-          <h3 className="text-lg font-semibold mb-1">Error loading product</h3>
-          <p className="text-muted-foreground text-center mb-4">
-            There was an error loading the product data. Please try again later.
-          </p>
-          <div className="flex gap-4">
-            <Button 
-              variant="outline" 
-              onClick={() => queryClient.invalidateQueries({ queryKey: ['products', productId] })}
-            >
-              Retry
-            </Button>
-            <Button onClick={() => navigate('/products')}>
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Products
-            </Button>
+        <div className="container mx-auto px-4 py-6">
+          <div className="flex flex-col items-center justify-center py-12">
+            <div className="rounded-full bg-destructive/10 p-3 mb-4">
+              <AlertCircle className="h-8 w-8 text-destructive" />
+            </div>
+            <h3 className="text-lg font-semibold mb-1">Error loading product</h3>
+            <p className="text-muted-foreground text-center mb-4">
+              There was an error loading the product data. Please try again later.
+            </p>
+            <div className="flex gap-4">
+              <Button 
+                variant="outline" 
+                onClick={() => queryClient.invalidateQueries({ queryKey: ['products', productId] })}
+              >
+                Retry
+              </Button>
+              <Button onClick={() => navigate('/products')}>
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back to Products
+              </Button>
+            </div>
           </div>
         </div>
       </AppLayout>
@@ -286,8 +287,10 @@ const ProductDetail = () => {
   if (isLoadingProduct || !product) {
     return (
       <AppLayout>
-        <div className="flex justify-center items-center h-[50vh]">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <div className="container mx-auto px-4 py-6">
+          <div className="flex justify-center items-center h-[50vh]">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
         </div>
       </AppLayout>
     );
@@ -297,354 +300,357 @@ const ProductDetail = () => {
 
   return (
     <AppLayout>
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <Button variant="outline" size="sm" onClick={() => navigate('/products')}>
-            <ArrowLeft className="mr-2 h-4 w-4" /> Back to Products
-          </Button>
-          <h1 className="text-3xl font-bold mt-2">{product.name}</h1>
-          <div className="flex items-center gap-2 text-muted-foreground mt-1">
-            <Tag className="h-4 w-4" />
-            <span>{product.sku}</span>
-            <Badge variant="secondary">{product.category}</Badge>
+      <div className="container mx-auto px-4 py-6">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <Button variant="outline" size="sm" onClick={() => navigate('/products')}>
+              <ArrowLeft className="mr-2 h-4 w-4" /> Back to Products
+            </Button>
+            <h1 className="text-2xl font-semibold mt-2">{product.name}</h1>
+            <div className="flex items-center gap-2 text-muted-foreground mt-1">
+              <Tag className="h-4 w-4" />
+              <span>{product.sku}</span>
+              <Badge variant="secondary">{product.category}</Badge>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+              <DialogTrigger asChild>
+                <Button>
+                  <Edit className="mr-2 h-4 w-4" /> Edit
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Edit Product</DialogTitle>
+                  <DialogDescription>
+                    Update the details for this product
+                  </DialogDescription>
+                </DialogHeader>
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                    <FormField
+                      control={form.control}
+                      name="name"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Product Name</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="sku"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>SKU</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="category"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Category</FormLabel>
+                          <Select value={field.value} onValueChange={field.onChange}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select category" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {CATEGORIES.map(category => (
+                                <SelectItem key={category} value={category}>
+                                  {category}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="quantity"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Quantity</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                min="0"
+                                step="1"
+                                {...field}
+                                disabled={true}
+                                onChange={e => field.onChange(Number(e.target.value))}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="reorder"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Reorder At</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                min="0"
+                                step="1"
+                                {...field}
+                                onChange={e => field.onChange(Number(e.target.value))}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    <FormField
+                      control={form.control}
+                      name="price"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Price ($)</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              min="0.01"
+                              step="0.01"
+                              {...field}
+                              onChange={e => field.onChange(Number(e.target.value))}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <DialogFooter>
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        onClick={() => setIsEditDialogOpen(false)}
+                      >
+                        Cancel
+                      </Button>
+                      <Button type="submit" disabled={updateMutation.isPending}>
+                        {updateMutation.isPending ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Updating...
+                          </>
+                        ) : (
+                          <>
+                            <Edit className="mr-2 h-4 w-4" /> Update
+                          </>
+                        )}
+                      </Button>
+                    </DialogFooter>
+                  </form>
+                </Form>
+              </DialogContent>
+            </Dialog>
+            
+            <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive">
+                  <Trash2 className="mr-2 h-4 w-4" /> Delete
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete Product</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Are you sure you want to delete "{product.name}"? This action cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction 
+                    onClick={() => deleteMutation.mutate()}
+                    className="bg-destructive hover:bg-destructive/90"
+                    disabled={deleteMutation.isPending}
+                  >
+                    {deleteMutation.isPending ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Deleting...
+                      </>
+                    ) : (
+                      'Delete'
+                    )}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <Edit className="mr-2 h-4 w-4" /> Edit
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-md">
-              <DialogHeader>
-                <DialogTitle>Edit Product</DialogTitle>
-                <DialogDescription>
-                  Update the details for this product
-                </DialogDescription>
-              </DialogHeader>
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                  <FormField
-                    control={form.control}
-                    name="name"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Product Name</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="sku"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>SKU</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="category"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Category</FormLabel>
-                        <Select value={field.value} onValueChange={field.onChange}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select category" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {CATEGORIES.map(category => (
-                              <SelectItem key={category} value={category}>
-                                {category}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <div className="grid grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="quantity"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Quantity</FormLabel>
-                          <FormControl>
-                            <Input
-                              type="number"
-                              min="0"
-                              step="1"
-                              {...field}
-                              onChange={e => field.onChange(Number(e.target.value))}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="reorder"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Reorder At</FormLabel>
-                          <FormControl>
-                            <Input
-                              type="number"
-                              min="0"
-                              step="1"
-                              {...field}
-                              onChange={e => field.onChange(Number(e.target.value))}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                  <FormField
-                    control={form.control}
-                    name="price"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Price ($)</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            min="0.01"
-                            step="0.01"
-                            {...field}
-                            onChange={e => field.onChange(Number(e.target.value))}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <DialogFooter>
-                    <Button 
-                      type="button" 
-                      variant="outline" 
-                      onClick={() => setIsEditDialogOpen(false)}
-                    >
-                      Cancel
-                    </Button>
-                    <Button type="submit" disabled={updateMutation.isPending}>
-                      {updateMutation.isPending ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Updating...
-                        </>
-                      ) : (
-                        <>
-                          <Edit className="mr-2 h-4 w-4" /> Update
-                        </>
-                      )}
-                    </Button>
-                  </DialogFooter>
-                </form>
-              </Form>
-            </DialogContent>
-          </Dialog>
-          
-          <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
-            <AlertDialogTrigger asChild>
-              <Button variant="destructive">
-                <Trash2 className="mr-2 h-4 w-4" /> Delete
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Delete Product</AlertDialogTitle>
-                <AlertDialogDescription>
-                  Are you sure you want to delete "{product.name}"? This action cannot be undone.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction 
-                  onClick={() => deleteMutation.mutate()}
-                  className="bg-destructive hover:bg-destructive/90"
-                  disabled={deleteMutation.isPending}
-                >
-                  {deleteMutation.isPending ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Deleting...
-                    </>
-                  ) : (
-                    'Delete'
-                  )}
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        </div>
-      </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Package className="h-5 w-5" /> Inventory
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex justify-between items-center mb-4">
-              <div className="text-2xl font-bold">{product.quantity}</div>
-              <Badge variant="outline" className={status.className}>
-                {status.label}
-              </Badge>
-            </div>
-            <div className="text-sm text-muted-foreground flex justify-between">
-              <span>Reorder Point</span>
-              <span>{product.reorder}</span>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Tag className="h-5 w-5" /> Pricing
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold mb-4">
-              ${product.price.toFixed(2)}
-            </div>
-            <div className="text-sm text-muted-foreground flex justify-between">
-              <span>Total Value</span>
-              <span>${(product.price * product.quantity).toFixed(2)}</span>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5" /> Details
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">SKU:</span>
-              <span className="font-medium">{product.sku}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Category:</span>
-              <span className="font-medium">{product.category}</span>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Tabs defaultValue="transactions" className="w-full">
-        <TabsList>
-          <TabsTrigger value="transactions" className="flex items-center gap-2">
-            <History className="h-4 w-4" /> Transaction History
-          </TabsTrigger>
-        </TabsList>
-        <TabsContent value="transactions" className="mt-4">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
           <Card>
             <CardHeader>
-              <CardTitle>Transaction History</CardTitle>
-              <CardDescription>
-                View all transactions for this product
-              </CardDescription>
+              <CardTitle className="flex items-center gap-2">
+                <Package className="h-5 w-5" /> Inventory
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              {isLoadingTransactions ? (
-                <div className="flex justify-center py-8">
-                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                </div>
-              ) : transactionsError ? (
-                <div className="flex flex-col items-center justify-center py-8">
-                  <AlertCircle className="h-8 w-8 text-destructive mb-2" />
-                  <p className="text-muted-foreground">Error loading transactions</p>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    className="mt-2"
-                    onClick={() => queryClient.invalidateQueries({ queryKey: ['products', productId, 'transactions'] })}
-                  >
-                    Retry
-                  </Button>
-                </div>
-              ) : transactions.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-8">
-                  <History className="h-8 w-8 text-muted-foreground mb-2" />
-                  <p className="text-muted-foreground">No transactions found for this product</p>
-                  <Link to="/transactions">
-                    <Button variant="outline" size="sm" className="mt-2">
-                      <PlusCircle className="mr-2 h-4 w-4" />
-                      Create Transaction
-                    </Button>
-                  </Link>
-                </div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Date</TableHead>
-                        <TableHead>Type</TableHead>
-                        <TableHead className="text-right">Quantity</TableHead>
-                        <TableHead>Reference</TableHead>
-                        <TableHead>Created By</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {transactions.map((transaction: Transaction) => (
-                        <TableRow key={transaction.id}>
-                          <TableCell className="font-medium">
-                            {formatDate(transaction.transactionDate)}
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-2">
-                              {getTransactionTypeIcon(transaction.transactionType)}
-                              {getTransactionTypeBadge(transaction.transactionType)}
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-right">
-                            {transaction.quantity}
-                          </TableCell>
-                          <TableCell>
-                            {transaction.reference || '-'}
-                          </TableCell>
-                          <TableCell className="flex items-center gap-2">
-                            <User className="h-3 w-3 text-muted-foreground" />
-                            {transaction.createdBy}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              )}
+              <div className="flex justify-between items-center mb-4">
+                <div className="text-2xl font-bold">{product.quantity}</div>
+                <Badge variant="outline" className={status.className}>
+                  {status.label}
+                </Badge>
+              </div>
+              <div className="text-sm text-muted-foreground flex justify-between">
+                <span>Reorder Point</span>
+                <span>{product.reorder}</span>
+              </div>
             </CardContent>
-            <CardFooter className="border-t bg-muted/50">
-              <Button variant="outline" size="sm" asChild>
-                <Link to="/transactions">
-                  <PlusCircle className="mr-2 h-4 w-4" />
-                  New Transaction
-                </Link>
-              </Button>
-            </CardFooter>
           </Card>
-        </TabsContent>
-      </Tabs>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Tag className="h-5 w-5" /> Pricing
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold mb-4">
+                ${product.price.toFixed(2)}
+              </div>
+              <div className="text-sm text-muted-foreground flex justify-between">
+                <span>Total Value</span>
+                <span>${(product.price * product.quantity).toFixed(2)}</span>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="h-5 w-5" /> Details
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">SKU:</span>
+                <span className="font-medium">{product.sku}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Category:</span>
+                <span className="font-medium">{product.category}</span>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <Tabs defaultValue="transactions" className="w-full">
+          <TabsList>
+            <TabsTrigger value="transactions" className="flex items-center gap-2">
+              <History className="h-4 w-4" /> Transaction History
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="transactions" className="mt-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Transaction History</CardTitle>
+                <CardDescription>
+                  View all transactions for this product
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {isLoadingTransactions ? (
+                  <div className="flex justify-center py-8">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                  </div>
+                ) : transactionsError ? (
+                  <div className="flex flex-col items-center justify-center py-8">
+                    <AlertCircle className="h-8 w-8 text-destructive mb-2" />
+                    <p className="text-muted-foreground">Error loading transactions</p>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      className="mt-2"
+                      onClick={() => queryClient.invalidateQueries({ queryKey: ['products', productId, 'transactions'] })}
+                    >
+                      Retry
+                    </Button>
+                  </div>
+                ) : transactions.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-8">
+                    <History className="h-8 w-8 text-muted-foreground mb-2" />
+                    <p className="text-muted-foreground">No transactions found for this product</p>
+                    <Link to="/transactions">
+                      <Button variant="outline" size="sm" className="mt-2">
+                        <PlusCircle className="mr-2 h-4 w-4" />
+                        Create Transaction
+                      </Button>
+                    </Link>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Date</TableHead>
+                          <TableHead>Type</TableHead>
+                          <TableHead className="text-right">Quantity</TableHead>
+                          <TableHead>Reference</TableHead>
+                          <TableHead>Created By</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {transactions.map((transaction: Transaction) => (
+                          <TableRow key={transaction.id}>
+                            <TableCell className="font-medium">
+                              {formatDate(transaction.transactionDate)}
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex items-center gap-2">
+                                {getTransactionTypeIcon(transaction.transactionType)}
+                                {getTransactionTypeBadge(transaction.transactionType)}
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-right">
+                              {transaction.quantity}
+                            </TableCell>
+                            <TableCell>
+                              {transaction.reference || '-'}
+                            </TableCell>
+                            <TableCell className="flex items-center gap-2">
+                              <User className="h-3 w-3 text-muted-foreground" />
+                              {transaction.createdBy}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                )}
+              </CardContent>
+              <CardFooter className="border-t bg-muted/50">
+                <Button variant="outline" size="sm" asChild>
+                  <Link to="/transactions">
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    New Transaction
+                  </Link>
+                </Button>
+              </CardFooter>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
     </AppLayout>
   );
 };

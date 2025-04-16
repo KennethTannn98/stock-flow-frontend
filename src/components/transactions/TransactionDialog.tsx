@@ -145,7 +145,17 @@ const TransactionDialog = ({
                 <FormItem>
                   <FormLabel>Transaction Date</FormLabel>
                   <FormControl>
-                    <Input type="date" {...field} />
+                    <Input 
+                      type="date"
+                      {...field}
+                      value={field.value ? new Date(field.value).toLocaleDateString('en-SG', { timeZone: 'Asia/Singapore' }).split('/').reverse().join('-') : new Date().toLocaleDateString('en-SG', { timeZone: 'Asia/Singapore' }).split('/').reverse().join('-')}
+                      onChange={(e) => {
+                        const selectedDate = e.target.value;
+                        // Create a date object in SGT
+                        const sgtDate = new Date(selectedDate + 'T12:00:00+08:00');
+                        field.onChange(sgtDate.toISOString());
+                      }}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

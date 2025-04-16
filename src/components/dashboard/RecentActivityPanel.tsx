@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -22,16 +21,14 @@ const RecentActivityPanel = () => {
       ? todaysTransactions
       : todaysTransactions.filter(item => 
           activeTab === 'in' ? item.transactionType === 'IN' : item.transactionType === 'OUT'))
+        .slice(0, 5)
     : [];
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleString('en-US', { 
       month: 'short', 
-      day: 'numeric', 
-      hour: 'numeric', 
-      minute: '2-digit',
-      hour12: true 
+      day: 'numeric'
     });
   };
 
@@ -108,10 +105,6 @@ const RecentActivityPanel = () => {
             </div>
           )}
         </div>
-
-        <Button variant="ghost" className="w-full mt-2 text-muted-foreground text-sm">
-          View All Activity <ArrowRight className="h-4 w-4 ml-1" />
-        </Button>
       </CardContent>
     </Card>
   );

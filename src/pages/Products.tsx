@@ -9,6 +9,7 @@ import {
   Plus,
   AlertCircle,
   X,
+  RefreshCcw
 } from 'lucide-react';
 import AppLayout from '@/components/layout/AppLayout';
 import { Input } from '@/components/ui/input';
@@ -78,7 +79,7 @@ const Products = () => {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
-  
+
   // Fetch products
   const { data: products = [], isLoading, error } = useQuery({
     queryKey: ['products'],
@@ -88,7 +89,6 @@ const Products = () => {
   // Create product mutation
   const createMutation = useMutation({
     mutationFn: (values: ProductFormValues) => {
-      // Ensure all required fields are present for create
       const product: ProductCreate = {
         name: values.name,
         quantity: values.quantity,
@@ -201,61 +201,75 @@ const Products = () => {
 
   return (
     <AppLayout>
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold">Product Management</h1>
-        <p className="text-muted-foreground">View, add, edit, and remove products</p>
-      </div>
-
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle>Filters</CardTitle>
-          <CardDescription>Search and filter products</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search by name or SKU..."
-                className="pl-9"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-              <SelectTrigger>
-                <SelectValue placeholder="Category" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Categories</SelectItem>
-                {uniqueCategories.map(category => (
-                  <SelectItem key={category} value={category.toLowerCase()}>{category}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <div className="flex gap-2">
-              <Button className="flex items-center gap-2">
-                <Filter className="h-4 w-4" />
-                Apply Filters
-              </Button>
-              <Button variant="outline" onClick={resetFilters}>Reset</Button>
-            </div>
+      <div className="container mx-auto px-4 py-6">
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h1 className="text-2xl font-semibold">Products</h1>
+            <p className="text-muted-foreground">Manage your product inventory</p>
           </div>
-        </CardContent>
-      </Card>
+          <Button onClick={() => setIsAddDialogOpen(true)}>
+            <Plus className="h-4 w-4 mr-2" /> Add Product
+          </Button>
+        </div>
 
-      <Card>
-        <CardContent>
-          <ProductTable
-            products={products}
-            filteredProducts={filteredProducts()}
-            getStockStatus={getStockStatus}
-            setEditingProduct={setEditingProduct}
-            setDeleteConfirmId={setDeleteConfirmId}
-            deleteMutation={deleteMutation}
-          />
-        </CardContent>
-      </Card>
+        <Card className="mb-6">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg">Filters</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="text-sm font-medium mb-1 block text-muted-foreground">Search</label>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search by name or SKU..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-9"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="text-sm font-medium mb-1 block text-muted-foreground">Category</label>
+                <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="All Categories" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Categories</SelectItem>
+                    {uniqueCategories.map(category => (
+                      <SelectItem key={category} value={category.toLowerCase()}>{category}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex items-end">
+                <Button 
+                  variant="outline" 
+                  onClick={resetFilters}
+                  className="h-10"
+                >
+                  <RefreshCcw className="h-4 w-4 mr-2" /> Reset Filters
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-0">
+            <ProductTable
+              products={products}
+              filteredProducts={filteredProducts()}
+              getStockStatus={getStockStatus}
+              setEditingProduct={setEditingProduct}
+              setDeleteConfirmId={setDeleteConfirmId}
+              deleteMutation={deleteMutation}
+            />
+          </CardContent>
+        </Card>
+      </div>
 
       <ProductDialog
         open={isAddDialogOpen || !!editingProduct}
