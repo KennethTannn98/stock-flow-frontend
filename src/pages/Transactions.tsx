@@ -572,9 +572,4 @@ const Transactions = () => {
   );
 };
 
-<<<<<<< HEAD
 export default Transactions;
-=======
-export default Transactions;
-
->>>>>>> 23739298692712aca215102b5c0e29a48297050c
