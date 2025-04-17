@@ -11,6 +11,7 @@ import {
   X,
   RefreshCcw
 } from 'lucide-react';
+import AppLayout from '@/components/layout/AppLayout';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import {
@@ -42,6 +43,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import ProductTable from '@/components/products/ProductTable';
 import ProductDialog from '@/components/products/ProductDialog';
 
+// Schema for product form validation
 const productSchema = z.object({
   name: z.string().min(1, { message: "Name is required" }),
   quantity: z.number().min(0, { message: "Quantity must be 0 or more" }),
@@ -53,6 +55,7 @@ const productSchema = z.object({
 
 type ProductFormValues = z.infer<typeof productSchema>;
 
+// Convert to form values
 const productToFormValues = (product?: Product): ProductFormValues => {
   return {
     name: product?.name || '',
@@ -64,6 +67,7 @@ const productToFormValues = (product?: Product): ProductFormValues => {
   };
 };
 
+// Available product categories
 const CATEGORIES = [
   "GPU", "CPU", "MOBO", "RAM", "SSD", "PSU", "FAN", "CASE", "PERI"
 ];
@@ -76,11 +80,13 @@ const Products = () => {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
 
+  // Fetch products
   const { data: products = [], isLoading, error } = useQuery({
     queryKey: ['products'],
     queryFn: getProducts,
   });
 
+  // Create product mutation
   const createMutation = useMutation({
     mutationFn: (values: ProductFormValues) => {
       const product: ProductCreate = {
@@ -103,6 +109,7 @@ const Products = () => {
     },
   });
 
+  // Update product mutation
   const updateMutation = useMutation({
     mutationFn: ({ id, values }: { id: number; values: ProductFormValues }) => {
       const product: ProductUpdate = {
@@ -125,6 +132,7 @@ const Products = () => {
     },
   });
 
+  // Delete product mutation
   const deleteMutation = useMutation({
     mutationFn: deleteProduct,
     onSuccess: () => {
@@ -137,11 +145,13 @@ const Products = () => {
     },
   });
 
+  // Form setup for adding/editing products
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema),
     defaultValues: productToFormValues(),
   });
-
+  
+  // Reset form when editing product changes
   useEffect(() => {
     if (editingProduct) {
       form.reset(productToFormValues(editingProduct));
@@ -150,6 +160,7 @@ const Products = () => {
     }
   }, [editingProduct, form]);
 
+  // Handle form submit
   const onSubmit = (values: ProductFormValues) => {
     if (editingProduct) {
       updateMutation.mutate({ id: editingProduct.id, values });
@@ -158,6 +169,7 @@ const Products = () => {
     }
   };
 
+  // Filter products based on search query and category
   const filteredProducts = useCallback(() => {
     return products.filter(product => {
       const matchesSearch = 
@@ -171,13 +183,16 @@ const Products = () => {
     });
   }, [products, searchQuery, categoryFilter]);
 
+  // Reset filters
   const resetFilters = () => {
     setSearchQuery('');
     setCategoryFilter('all');
   };
 
+  // Calculate unique categories from actual data
   const uniqueCategories = [...new Set(products.map(p => p.category))];
   
+  // Determine stock status
   const getStockStatus = (product: Product) => {
     if (product.quantity <= 0) return { label: 'Out of Stock', className: 'border-red-500 text-red-500' };
     if (product.quantity <= product.reorder) return { label: 'Low Stock', className: 'border-yellow-500 text-yellow-500' };
@@ -185,74 +200,76 @@ const Products = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-6">
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-2xl font-semibold">Products</h1>
-          <p className="text-muted-foreground">Manage your product inventory</p>
+    <AppLayout>
+      <div className="container mx-auto px-4 py-6">
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h1 className="text-2xl font-semibold">Products</h1>
+            <p className="text-muted-foreground">Manage your product inventory</p>
+          </div>
+          <Button onClick={() => setIsAddDialogOpen(true)}>
+            <Plus className="h-4 w-4 mr-2" /> Add Product
+          </Button>
         </div>
-        <Button onClick={() => setIsAddDialogOpen(true)}>
-          <Plus className="h-4 w-4 mr-2" /> Add Product
-        </Button>
-      </div>
 
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg">Filters</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="text-sm font-medium mb-1 block text-muted-foreground">Search</label>
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search by name or SKU..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9"
-                />
+        <Card className="mb-6">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg">Filters</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="text-sm font-medium mb-1 block text-muted-foreground">Search</label>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search by name or SKU..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-9"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="text-sm font-medium mb-1 block text-muted-foreground">Category</label>
+                <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="All Categories" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Categories</SelectItem>
+                    {uniqueCategories.map(category => (
+                      <SelectItem key={category} value={category.toLowerCase()}>{category}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex items-end">
+                <Button 
+                  variant="outline" 
+                  onClick={resetFilters}
+                  className="h-10"
+                >
+                  <RefreshCcw className="h-4 w-4 mr-2" /> Reset Filters
+                </Button>
               </div>
             </div>
-            <div>
-              <label className="text-sm font-medium mb-1 block text-muted-foreground">Category</label>
-              <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                <SelectTrigger>
-                  <SelectValue placeholder="All Categories" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Categories</SelectItem>
-                  {uniqueCategories.map(category => (
-                    <SelectItem key={category} value={category.toLowerCase()}>{category}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex items-end">
-              <Button 
-                variant="outline" 
-                onClick={resetFilters}
-                className="h-10"
-              >
-                <RefreshCcw className="h-4 w-4 mr-2" /> Reset Filters
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
 
-      <Card>
-        <CardContent className="p-0">
-          <ProductTable
-            products={products}
-            filteredProducts={filteredProducts()}
-            getStockStatus={getStockStatus}
-            setEditingProduct={setEditingProduct}
-            setDeleteConfirmId={setDeleteConfirmId}
-            deleteMutation={deleteMutation}
-          />
-        </CardContent>
-      </Card>
+        <Card>
+          <CardContent className="p-0">
+            <ProductTable
+              products={products}
+              filteredProducts={filteredProducts()}
+              getStockStatus={getStockStatus}
+              setEditingProduct={setEditingProduct}
+              setDeleteConfirmId={setDeleteConfirmId}
+              deleteMutation={deleteMutation}
+            />
+          </CardContent>
+        </Card>
+      </div>
 
       <ProductDialog
         open={isAddDialogOpen || !!editingProduct}
@@ -265,7 +282,7 @@ const Products = () => {
         categories={CATEGORIES}
         isEditing={!!editingProduct}
       />
-    </div>
+    </AppLayout>
   );
 };
 

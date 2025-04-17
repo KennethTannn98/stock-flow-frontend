@@ -49,15 +49,47 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/login" element={<LoginForm />} />
+            <Route 
+              path="/dashboard" 
+              element={
+                <ProtectedRoute>
+                  <Index />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/products" 
+              element={
+                <ProtectedRoute>
+                  <Products />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/products/:id" 
+              element={
+                <ProtectedRoute>
+                  <ProductDetail />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/transactions" 
+              element={
+                <ProtectedRoute>
+                  <Transactions />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/alerts" 
+              element={
+                <ProtectedRoute>
+                  <Alerts />
+                </ProtectedRoute>
+              } 
+            />
             <Route path="/" element={<RootRedirect />} />
-            
-            {/* Protected Routes */}
-            <Route path="/dashboard" element={<ProtectedRoute><Index /></ProtectedRoute>} />
-            <Route path="/products" element={<ProtectedRoute><Products /></ProtectedRoute>} />
-            <Route path="/products/:id" element={<ProtectedRoute><ProductDetail /></ProtectedRoute>} />
-            <Route path="/transactions" element={<ProtectedRoute><Transactions /></ProtectedRoute>} />
-            <Route path="/alerts" element={<ProtectedRoute><Alerts /></ProtectedRoute>} />
-            
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
