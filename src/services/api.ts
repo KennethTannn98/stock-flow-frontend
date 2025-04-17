@@ -1,3 +1,4 @@
+
 import axios from 'axios';
 
 const API_BASE_URL = 'http://localhost:8080/api';
@@ -68,6 +69,24 @@ export interface Alert {
   createdBy: string;
   updatedBy: string;
 }
+
+// User management types
+export interface User {
+  id: number;
+  username: string;
+  password: null;
+  role: 'ROLE_USER' | 'ROLE_ADMIN' | 'ROLE_MANAGER';
+  createdDate: string | null;
+  updatedDate: string | null;
+  createdBy: string | null;
+  updatedBy: string | null;
+}
+
+export type UserCreate = {
+  username: string;
+  password: string;
+  role: 'ROLE_USER' | 'ROLE_ADMIN' | 'ROLE_MANAGER';
+};
 
 export type ProductCreate = Omit<Product, 'id'>;
 export type ProductUpdate = Partial<Product>;
@@ -187,4 +206,24 @@ export const updateAlert = async (id: number, alert: AlertUpdate): Promise<Alert
 
 export const deleteAlert = async (id: number): Promise<void> => {
   await instance.delete(`/alerts/${id}`);
+};
+
+// Admin User Management API methods
+export const getUsers = async (): Promise<User[]> => {
+  const response = await instance.get(`/admin/users`);
+  return response.data;
+};
+
+export const createUser = async (user: UserCreate): Promise<User> => {
+  const response = await instance.post(`/admin/users`, user);
+  return response.data;
+};
+
+export const updateUserRole = async (username: string, role: 'ROLE_USER' | 'ROLE_ADMIN' | 'ROLE_MANAGER'): Promise<User> => {
+  const response = await instance.put(`/admin/users/${username}/role`, { role });
+  return response.data;
+};
+
+export const deleteUser = async (id: number): Promise<void> => {
+  await instance.delete(`/admin/users/${id}`);
 };
