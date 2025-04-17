@@ -11,6 +11,7 @@ import ProductDetail from "./pages/ProductDetail";
 import Transactions from "./pages/Transactions";
 import Alerts from "./pages/Alerts";
 import NotFound from "./pages/NotFound";
+import LoginForm from "./components/login/LoginForm";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -29,12 +30,12 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Index />} />
+            <Route path="/dashboard" element={<Index />} />
             <Route path="/products" element={<Products />} />
             <Route path="/products/:id" element={<ProductDetail />} />
             <Route path="/transactions" element={<Transactions />} />
             <Route path="/alerts" element={<Alerts />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="/login" element={<LoginForm />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

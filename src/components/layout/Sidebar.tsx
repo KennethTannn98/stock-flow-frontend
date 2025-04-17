@@ -21,7 +21,7 @@ const Sidebar = () => {
   const location = useLocation();
 
   const navItems = [
-    { label: 'Dashboard', icon: LayoutDashboard, path: '/' },
+    { label: 'Dashboard', icon: LayoutDashboard, path: '/Dashboard' },
     { label: 'Products', icon: Box, path: '/Products' },
     { label: 'Transactions', icon: ClipboardList, path: '/Transactions' },
     { label: 'Alerts', icon: AlertTriangle, path: '/alerts' },

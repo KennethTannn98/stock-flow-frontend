@@ -2,6 +2,25 @@ import axios from 'axios';
 
 const API_BASE_URL = 'http://localhost:8080/api';
 
+// Create axios instance with base configuration
+const instance = axios.create({
+  baseURL: API_BASE_URL,
+  withCredentials: true, // Required for CORS
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'
+  }
+});
+
+// Add JWT token to every request if available
+instance.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers['Authorization'] = `Bearer ${token}`;
+  }
+  return config;
+});
+
 // Types for API responses
 export interface DashboardStats {
   totalProducts: number;
@@ -60,102 +79,112 @@ export type LowStockProduct = Product;
 
 // API service methods
 export const getDashboardStats = async (): Promise<DashboardStats> => {
-  const response = await axios.get(`${API_BASE_URL}/dashboard/stats`);
+  const response = await instance.get(`/dashboard/stats`);
   return response.data;
 };
 
 export const getMonthlyTransactions = async (): Promise<MonthlyTransaction[]> => {
-  const response = await axios.get(`${API_BASE_URL}/dashboard/monthly-transactions`);
+  const response = await instance.get(`/dashboard/monthly-transactions`);
   return response.data;
 };
 
 export const getLowStockProducts = async (): Promise<LowStockProduct[]> => {
-  const response = await axios.get(`${API_BASE_URL}/dashboard/low-stocks`);
+  const response = await instance.get(`/dashboard/low-stocks`);
   return response.data;
 };
 
 // New API method to fetch today's transactions
 export const getTodaysTransactions = async (): Promise<Transaction[]> => {
-  const response = await axios.get(`${API_BASE_URL}/dashboard/todays-transactions`);
+  const response = await instance.get(`/dashboard/todays-transactions`);
+  return response.data;
+};
+
+// Auth API methods
+export interface LoginResponse {
+  token: string;
+}
+
+export const login = async (username: string, password: string): Promise<LoginResponse> => {
+  const response = await instance.post('/auth/login', { username, password });
   return response.data;
 };
 
 // Product API methods
 export const getProducts = async (): Promise<Product[]> => {
-  const response = await axios.get(`${API_BASE_URL}/products`);
+  const response = await instance.get(`/products`);
   return response.data;
 };
 
 export const getProduct = async (id: number): Promise<Product> => {
-  const response = await axios.get(`${API_BASE_URL}/products/${id}`);
+  const response = await instance.get(`/products/${id}`);
   return response.data;
 };
 
 export const createProduct = async (product: ProductCreate): Promise<Product> => {
-  const response = await axios.post(`${API_BASE_URL}/products`, product);
+  const response = await instance.post(`/products`, product);
   return response.data;
 };
 
 export const updateProduct = async (id: number, product: ProductUpdate): Promise<Product> => {
-  const response = await axios.put(`${API_BASE_URL}/products/${id}`, product);
+  const response = await instance.put(`/products/${id}`, product);
   return response.data;
 };
 
 export const deleteProduct = async (id: number): Promise<void> => {
-  await axios.delete(`${API_BASE_URL}/products/${id}`);
+  await instance.delete(`/products/${id}`);
 };
 
 // Transaction API methods
 export const getTransactions = async (): Promise<Transaction[]> => {
-  const response = await axios.get(`${API_BASE_URL}/transactions`);
+  const response = await instance.get(`/transactions`);
   return response.data;
 };
 
 export const getProductTransactions = async (productId: number): Promise<Transaction[]> => {
-  const response = await axios.get(`${API_BASE_URL}/transactions/product/${productId}`);
+  const response = await instance.get(`/transactions/product/${productId}`);
   return response.data;
 };
 
 export const getTransaction = async (id: number): Promise<Transaction> => {
-  const response = await axios.get(`${API_BASE_URL}/transactions/${id}`);
+  const response = await instance.get(`/transactions/${id}`);
   return response.data;
 };
 
 export const createTransaction = async (transaction: TransactionCreate): Promise<Transaction> => {
-  const response = await axios.post(`${API_BASE_URL}/transactions`, transaction);
+  const response = await instance.post(`/transactions`, transaction);
   return response.data;
 };
 
 export const updateTransaction = async (id: number, transaction: TransactionUpdate): Promise<Transaction> => {
-  const response = await axios.put(`${API_BASE_URL}/transactions/${id}`, transaction);
+  const response = await instance.put(`/transactions/${id}`, transaction);
   return response.data;
 };
 
 export const deleteTransaction = async (id: number): Promise<void> => {
-  await axios.delete(`${API_BASE_URL}/transactions/${id}`);
+  await instance.delete(`/transactions/${id}`);
 };
 
 // Alert API methods
 export const getAlerts = async (): Promise<Alert[]> => {
-  const response = await axios.get(`${API_BASE_URL}/alerts`);
+  const response = await instance.get(`/alerts`);
   return response.data;
 };
 
 export const getAlert = async (id: number): Promise<Alert> => {
-  const response = await axios.get(`${API_BASE_URL}/alerts/${id}`);
+  const response = await instance.get(`/alerts/${id}`);
   return response.data;
 };
 
 export const createAlert = async (alert: AlertCreate): Promise<Alert> => {
-  const response = await axios.post(`${API_BASE_URL}/alerts`, alert);
+  const response = await instance.post(`/alerts`, alert);
   return response.data;
 };
 
 export const updateAlert = async (id: number, alert: AlertUpdate): Promise<Alert> => {
-  const response = await axios.put(`${API_BASE_URL}/alerts/${id}`, alert);
+  const response = await instance.put(`/alerts/${id}`, alert);
   return response.data;
 };
 
 export const deleteAlert = async (id: number): Promise<void> => {
-  await axios.delete(`${API_BASE_URL}/alerts/${id}`);
+  await instance.delete(`/alerts/${id}`);
 };
