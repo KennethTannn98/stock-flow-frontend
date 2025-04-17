@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from './ThemeToggle';
@@ -14,11 +14,15 @@ import {
   ChevronLeft,
   ChevronRight,
   AlertTriangle,
+  LogOut,
 } from 'lucide-react';
+import { toast } from '@/components/ui/sonner';
 
 const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const username = localStorage.getItem('username') || 'Admin';
 
   const navItems = [
     { label: 'Dashboard', icon: LayoutDashboard, path: '/Dashboard' },
@@ -27,6 +31,13 @@ const Sidebar = () => {
     { label: 'Alerts', icon: AlertTriangle, path: '/alerts' },
     { label: 'Settings', icon: Settings, path: '/settings' },
   ];
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('username');
+    toast.success("Logged out successfully");
+    navigate('/login');
+  };
 
   return (
     <div
@@ -71,16 +82,30 @@ const Sidebar = () => {
       </div>
 
       <div className="p-4 border-t border-border">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-sidebar-accent flex items-center justify-center">
-              <span className="font-medium text-sidebar-accent-foreground text-sm">
-                {collapsed ? 'A' : ''}
-              </span>
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-sidebar-accent flex items-center justify-center">
+                <span className="font-medium text-sidebar-accent-foreground text-sm">
+                  {username.charAt(0).toUpperCase()}
+                </span>
+              </div>
+              {!collapsed && <span className="text-sm font-medium">{username}</span>}
             </div>
-            {!collapsed && <span className="text-sm font-medium">Admin User</span>}
+            {!collapsed && <ThemeToggle />}
           </div>
-          {!collapsed && <ThemeToggle />}
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={handleLogout}
+            className={cn(
+              "flex items-center justify-center",
+              collapsed ? "w-8 h-8 p-0" : "w-full"
+            )}
+          >
+            <LogOut className="h-4 w-4" />
+            {!collapsed && <span className="ml-2">Logout</span>}
+          </Button>
         </div>
       </div>
     </div>
