@@ -30,6 +30,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
+// Define the form schema to ensure all required fields are present
 const formSchema = z.object({
   username: z.string().min(3, {
     message: 'Username must be at least 3 characters long',
@@ -42,6 +43,9 @@ const formSchema = z.object({
   }),
 });
 
+// Create a type that matches our zod schema
+type FormValues = z.infer<typeof formSchema>;
+
 interface UserDialogProps {
   open: boolean;
   onClose: () => void;
@@ -49,7 +53,7 @@ interface UserDialogProps {
 }
 
 const UserDialog: React.FC<UserDialogProps> = ({ open, onClose, onSubmit }) => {
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       username: '',
@@ -58,8 +62,13 @@ const UserDialog: React.FC<UserDialogProps> = ({ open, onClose, onSubmit }) => {
     },
   });
 
-  const handleSubmit = (data: z.infer<typeof formSchema>) => {
-    onSubmit(data);
+  const handleSubmit = (data: FormValues) => {
+    // Here we explicitly cast data as UserCreate because we've validated it matches the schema
+    onSubmit({
+      username: data.username,
+      password: data.password,
+      role: data.role,
+    });
     form.reset();
   };
 
