@@ -10,7 +10,6 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Alert, getAlerts, updateAlert, deleteAlert, createAlert, AlertCreate, AlertUpdate } from '@/services/api';
-import AppLayout from '@/components/layout/AppLayout';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import {
@@ -145,7 +144,7 @@ const Alerts = () => {
   };
 
   return (
-    <AppLayout>
+    <>
       <div className="container mx-auto px-4 py-6">
         <div className="flex justify-between items-center mb-6">
           <div>
@@ -228,7 +227,7 @@ const Alerts = () => {
         onSubmit={onSubmit}
         form={form}
       />
-    </AppLayout>
+    </>
   );
 };
 

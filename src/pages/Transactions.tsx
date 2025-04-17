@@ -16,8 +16,6 @@ import {
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-
-import AppLayout from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -257,7 +255,7 @@ const Transactions = () => {
   };
 
   return (
-    <AppLayout>
+    <>
       <div className="container mx-auto px-4 py-6">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-semibold">Transactions</h1>
@@ -340,7 +338,7 @@ const Transactions = () => {
         products={products}
         isEditing={!!editingTransaction}
       />
-    </AppLayout>
+    </>
   );
 };
 

@@ -11,7 +11,6 @@ import {
   X,
   RefreshCcw
 } from 'lucide-react';
-import AppLayout from '@/components/layout/AppLayout';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import {
@@ -200,7 +199,7 @@ const Products = () => {
   };
 
   return (
-    <AppLayout>
+    <>
       <div className="container mx-auto px-4 py-6">
         <div className="flex justify-between items-center mb-6">
           <div>
@@ -282,7 +281,7 @@ const Products = () => {
         categories={CATEGORIES}
         isEditing={!!editingProduct}
       />
-    </AppLayout>
+    </>
   );
 };
 

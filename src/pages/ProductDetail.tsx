@@ -21,7 +21,6 @@ import {
   History,
   Loader2
 } from 'lucide-react';
-import AppLayout from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -255,7 +254,7 @@ const ProductDetail = () => {
   // Error state
   if (productError) {
     return (
-      <AppLayout>
+      <>
         <div className="container mx-auto px-4 py-6">
           <div className="flex flex-col items-center justify-center py-12">
             <div className="rounded-full bg-destructive/10 p-3 mb-4">
@@ -279,27 +278,27 @@ const ProductDetail = () => {
             </div>
           </div>
         </div>
-      </AppLayout>
+      </>
     );
   }
 
   // Loading state
   if (isLoadingProduct || !product) {
     return (
-      <AppLayout>
+      <>
         <div className="container mx-auto px-4 py-6">
           <div className="flex justify-center items-center h-[50vh]">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </div>
         </div>
-      </AppLayout>
+      </>
     );
   }
 
   const status = getStockStatus(product);
 
   return (
-    <AppLayout>
+    <>
       <div className="container mx-auto px-4 py-6">
         <div className="flex items-center justify-between mb-6">
           <div>
@@ -651,7 +650,7 @@ const ProductDetail = () => {
           </TabsContent>
         </Tabs>
       </div>
-    </AppLayout>
+    </>
   );
 };
 
