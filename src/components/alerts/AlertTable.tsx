@@ -123,6 +123,14 @@ const AlertTable = ({ alerts, isLoading, filteredAlerts, formatDate, handleToggl
                 Created By {getSortIcon('createdBy')}
               </div>
             </TableHead>
+            <TableHead 
+              onClick={() => handleSort('updatedBy')}
+              className="hidden md:table-cell cursor-pointer hover:bg-muted"
+            >
+              <div className="flex items-center">
+                Updated By {getSortIcon('updatedBy')}
+              </div>
+            </TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -175,6 +183,7 @@ const AlertTable = ({ alerts, isLoading, filteredAlerts, formatDate, handleToggl
                   </div>
                 </TableCell>
                 <TableCell className="hidden md:table-cell">{alert.createdBy}</TableCell>
+                <TableCell className="hidden md:table-cell">{alert.updatedBy}</TableCell>
                 <TableCell className="text-right">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>

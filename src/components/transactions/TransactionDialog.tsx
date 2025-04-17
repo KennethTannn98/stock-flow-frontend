@@ -162,20 +162,6 @@ const TransactionDialog = ({
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="createdBy"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Created By</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Username" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
             <DialogFooter>
               <Button type="button" variant="outline" onClick={onClose}>
                 Cancel
