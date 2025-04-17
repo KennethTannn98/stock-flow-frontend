@@ -15,12 +15,12 @@ import {
   createUser, 
   updateUserRole, 
   deleteUser,
-  User,
   UserCreate 
 } from '@/services/api';
 import { Plus, Users } from 'lucide-react';
 import UserTable from '@/components/settings/UserTable';
 import UserDialog from '@/components/settings/UserDialog';
+import ChangePasswordDialog from '@/components/settings/ChangePasswordDialog';
 
 const Settings = () => {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
@@ -97,6 +97,16 @@ const Settings = () => {
       </div>
 
       <div className="grid gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Account Settings</CardTitle>
+            <CardDescription>Manage your account security settings</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ChangePasswordDialog />
+          </CardContent>
+        </Card>
+
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <div>

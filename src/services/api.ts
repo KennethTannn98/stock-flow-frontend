@@ -1,4 +1,3 @@
-
 import axios from 'axios';
 
 const API_BASE_URL = 'http://localhost:8080/api';
@@ -95,6 +94,16 @@ export type TransactionUpdate = Partial<Transaction>;
 export type AlertCreate = Omit<Alert, 'id' | 'createdDate' | 'updatedDate'>;
 export type AlertUpdate = Partial<Omit<Alert, 'id' | 'createdDate' | 'updatedDate'>>;
 export type LowStockProduct = Product;
+
+// Types for password change
+export interface PasswordChange {
+  currentPassword: string;
+  newPassword: string;
+}
+
+export const changePassword = async (passwords: PasswordChange): Promise<void> => {
+  await instance.put('/account/password', passwords);
+};
 
 // API service methods
 export const getDashboardStats = async (): Promise<DashboardStats> => {
