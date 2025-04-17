@@ -220,7 +220,7 @@ export const createUser = async (user: UserCreate): Promise<User> => {
 };
 
 export const updateUserRole = async (username: string, role: 'ROLE_USER' | 'ROLE_ADMIN' | 'ROLE_MANAGER'): Promise<User> => {
-  const response = await instance.put(`/admin/users/${username}/role`, { role });
+  const response = await instance.put(`/admin/users/username/${username}/role`, { role });
   return response.data;
 };
 
