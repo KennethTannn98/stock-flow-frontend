@@ -1,6 +1,12 @@
-
 import { useEffect, useState } from 'react';
-import { Box, Package, AlertTriangle, ShoppingCart } from 'lucide-react';
+import { 
+  Archive, 
+  PackageMinus, 
+  PackageX, 
+  Bell, 
+  BarChart3, 
+  ClipboardList
+} from 'lucide-react';
 import { getDashboardStats, getMonthlyTransactions, getLowStockProducts, DashboardStats, MonthlyTransaction, LowStockProduct } from '@/services/api';
 import StatCard from '@/components/dashboard/StatCard';
 import TransactionsChart from '@/components/dashboard/TransactionsChart';
@@ -56,27 +62,27 @@ const Dashboard = () => {
             <StatCard 
               title="Total Products" 
               value={stats.totalProducts} 
-              icon={Box} 
+              icon={Archive} 
               description="All products in inventory"
             />
             <StatCard 
               title="Low Stock Items" 
               value={stats.totalLowStockProducts} 
-              icon={Package} 
+              icon={PackageMinus} 
               description="Products below reorder level"
               className={stats.totalLowStockProducts > 0 ? "border-yellow-500/50" : undefined}
             />
             <StatCard 
               title="Out of Stock" 
               value={stats.totalOutOfStockProducts} 
-              icon={ShoppingCart} 
+              icon={PackageX} 
               description="Products with zero inventory"
               className={stats.totalOutOfStockProducts > 0 ? "border-red-500/50" : undefined}
             />
             <StatCard 
               title="Alerts YTD" 
               value={stats.totalAlertsYTD} 
-              icon={AlertTriangle} 
+              icon={Bell} 
               description="Total alerts year to date"
             />
           </>

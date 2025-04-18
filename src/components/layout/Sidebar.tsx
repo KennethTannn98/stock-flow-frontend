@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+// sidebar.tsx
+import { useState, useEffect, useMemo } from 'react'; // Added useMemo
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -26,13 +27,22 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import ChangePasswordDialog from '@/components/settings/ChangePasswordDialog';
+import { jwtDecode } from 'jwt-decode'; // <-- Import jwt-decode
+
+// Define the expected structure of the JWT payload based on your JwtUtil
+interface JwtPayload {
+  sub: string; // Subject (username)
+  roles: { authority: string }[]; // Roles claim as set in JwtUtil
+  iat: number; // Issued at
+  exp: number; // Expiration time
+}
 
 const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const username = localStorage.getItem('username') || 'Admin';
+  const username = localStorage.getItem('username') || 'User'; // Default to 'User' if not found
 
   const { data: alerts = [] } = useQuery({
     queryKey: ['alerts'],
@@ -41,22 +51,80 @@ const Sidebar = () => {
 
   const unresolvedCount = alerts.filter(alert => !alert.resolved).length;
 
-  const navItems = [
+  // --- Role Checking Logic ---
+  const userRole = useMemo(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      return null; // No token, no specific role
+    }
+    try {
+      // Decode the token
+      const decoded = jwtDecode<JwtPayload>(token);
+
+      // Extract the first role (assuming one primary role per user in your setup)
+      // Your JwtUtil adds roles like: .claim("roles", userDetails.getAuthorities())
+      // userDetails.getAuthorities() returns a list, often containing SimpleGrantedAuthority
+      // jwt-decode usually parses this as an array of objects with an 'authority' key
+      if (decoded.roles && decoded.roles.length > 0) {
+        // Return the authority string, e.g., "ROLE_ADMIN", "ROLE_USER"
+        return decoded.roles[0]?.authority;
+      }
+      return null; // No roles claim found
+    } catch (error) {
+      console.error("Failed to decode JWT or invalid token:", error);
+      // Optional: Handle invalid token (e.g., force logout)
+      // localStorage.removeItem('token');
+      // localStorage.removeItem('username');
+      // navigate('/login');
+      return null;
+    }
+  }, []); // Recalculate only when the component mounts or if dependencies change (none here, depends on localStorage)
+
+  const isAdmin = userRole === 'ROLE_ADMIN';
+  // --- End Role Checking Logic ---
+
+
+  // Define base navigation items
+  const baseNavItems = [
     { label: 'Dashboard', icon: LayoutDashboard, path: '/Dashboard' },
     { label: 'Products', icon: Box, path: '/Products' },
     { label: 'Transactions', icon: ClipboardList, path: '/Transactions' },
-    { 
-      label: 'Alerts', 
-      icon: AlertTriangle, 
+    {
+      label: 'Alerts',
+      icon: AlertTriangle,
       path: '/alerts',
       badge: unresolvedCount > 0 ? unresolvedCount : undefined
     },
-    { label: 'Settings', icon: Settings, path: '/settings' },
+    // Add the Settings item conditionally based on isAdmin flag
+    ...(isAdmin ? [{ label: 'Settings', icon: Settings, path: '/settings' }] : [])
   ];
+
+  // Filter navItems (or build dynamically as above)
+  // If you prefer filtering:
+  /*
+  const navItems = useMemo(() => {
+     const allItems = [
+       { label: 'Dashboard', icon: LayoutDashboard, path: '/Dashboard' },
+       { label: 'Products', icon: Box, path: '/Products' },
+       { label: 'Transactions', icon: ClipboardList, path: '/Transactions' },
+       {
+         label: 'Alerts',
+         icon: AlertTriangle,
+         path: '/alerts',
+         badge: unresolvedCount > 0 ? unresolvedCount : undefined
+       },
+       { label: 'Settings', icon: Settings, path: '/settings', adminOnly: true }, // Add a flag
+     ];
+
+     return allItems.filter(item => !item.adminOnly || isAdmin); // Keep if not adminOnly OR if user is admin
+
+  }, [isAdmin, unresolvedCount]); // Re-filter if isAdmin or badge count changes
+  */
 
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('username');
+    // Optionally remove role if you decide to store it separately later
     toast.success("Logged out successfully");
     navigate('/login');
   };
@@ -87,7 +155,8 @@ const Sidebar = () => {
 
       <div className="flex-1 py-4 overflow-y-auto">
         <nav className="space-y-1 px-2">
-          {navItems.map((item) => (
+          {/* Use the dynamically built baseNavItems */}
+          {baseNavItems.map((item) => (
             <Link
               key={item.label}
               to={item.path}
@@ -111,6 +180,7 @@ const Sidebar = () => {
         </nav>
       </div>
 
+      {/* Rest of the component remains the same */}
       <div className="p-4 border-t border-border">
         <div className="flex flex-col gap-3">
           <DropdownMenu>
@@ -139,7 +209,7 @@ const Sidebar = () => {
         </div>
       </div>
 
-      <ChangePasswordDialog 
+      <ChangePasswordDialog
         open={isPasswordDialogOpen}
         onOpenChange={setIsPasswordDialogOpen}
       />

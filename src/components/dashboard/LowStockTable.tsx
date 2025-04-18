@@ -50,14 +50,14 @@ const LowStockTable = ({ products }: LowStockTableProps) => {
                 <TableCell className="text-right">{product.reorder}</TableCell>
                 <TableCell className="text-right">${product.price.toFixed(2)}</TableCell>
                 <TableCell>
-                  <Badge variant="outline" className={
-                    product.quantity === 0 
-                      ? "border-red-500 text-red-500" 
-                      : "border-yellow-500 text-yellow-500"
-                  }>
-                    {product.quantity === 0 ? "Out of Stock" : "Low Stock"}
-                  </Badge>
-                </TableCell>
+  <Badge variant="secondary" className={
+    product.quantity === 0 
+      ? "bg-red-100 text-red-800 hover:bg-red-100 border-0" 
+      : "bg-yellow-100 text-yellow-800 hover:bg-yellow-100 border-0"
+  }>
+    {product.quantity === 0 ? "OOS" : "Low"}
+  </Badge>
+</TableCell>
               </TableRow>
             ))}
           </TableBody>

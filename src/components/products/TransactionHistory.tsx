@@ -66,16 +66,16 @@ export const TransactionHistory = ({ transactions, isLoading, error, productId }
   const getTransactionTypeBadge = (type: string) => {
     switch (type) {
       case 'IN':
-        return <Badge variant="outline" className="border-green-500 text-green-500">In</Badge>;
+        return <Badge className="bg-green-100 text-green-800 hover:bg-green-100 border-0">IN</Badge>;
       case 'OUT':
-        return <Badge variant="outline" className="border-red-500 text-red-500">Out</Badge>;
+        return <Badge className="bg-red-100 text-red-800 hover:bg-red-100 border-0">OUT</Badge>;
       case 'ADJUSTMENT':
-        return <Badge variant="outline" className="border-blue-500 text-blue-500">Adjustment</Badge>;
+        return <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100 border-0">ADJ</Badge>;
       default:
         return null;
     }
   };
-
+  
   if (isLoading) {
     return (
       <div className="flex justify-center py-8">

@@ -79,14 +79,14 @@ const RecentActivityPanel = () => {
                     <p className="text-sm font-medium">
                       {item.productName}
                     </p>
-                    <Badge variant={item.transactionType === 'IN' ? 'outline' : 'secondary'} className={cn(
-                      "ml-2",
-                      item.transactionType === 'IN' 
-                        ? 'border-green-500 text-green-500'
-                        : 'bg-amber-500/10 text-amber-500 border-amber-500/20'
-                    )}>
-                      {item.transactionType === 'IN' ? '+' : '-'}{item.quantity}
-                    </Badge>
+                    <Badge className={cn(
+  "ml-2",
+  item.transactionType === 'IN' 
+    ? 'bg-green-100 text-green-800 hover:bg-green-100 border-0'
+    : 'bg-amber-100 text-amber-800 hover:bg-amber-100 border-0'
+)}>
+  {item.transactionType === 'IN' ? '+' : '-'}{item.quantity}
+</Badge>
                   </div>
                   <div className="flex items-center justify-between mt-1">
                     <p className="text-xs text-muted-foreground">

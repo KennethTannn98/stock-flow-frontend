@@ -15,9 +15,18 @@ interface ProductStatsProps {
 
 export const ProductStats = ({ product }: ProductStatsProps) => {
   const getStockStatus = (product: Product) => {
-    if (product.quantity <= 0) return { label: 'Out of Stock', className: 'border-red-500 text-red-500' };
-    if (product.quantity <= product.reorder) return { label: 'Low Stock', className: 'border-yellow-500 text-yellow-500' };
-    return { label: 'In Stock', className: 'border-green-500 text-green-500' };
+    if (product.quantity <= 0) return { 
+      label: 'OOS', 
+      className: 'bg-red-100 text-red-800 hover:bg-red-100 border-0' 
+    };
+    if (product.quantity <= product.reorder) return { 
+      label: 'Low', 
+      className: 'bg-yellow-100 text-yellow-800 hover:bg-yellow-100 border-0' 
+    };
+    return { 
+      label: 'Available', 
+      className: 'bg-green-100 text-green-800 hover:bg-green-100 border-0' 
+    };
   };
 
   const status = getStockStatus(product);
