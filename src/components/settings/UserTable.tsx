@@ -55,7 +55,6 @@ const UserTable: React.FC<UserTableProps> = ({
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>ID</TableHead>
           <TableHead>Username</TableHead>
           <TableHead>Role</TableHead>
           <TableHead>Created Date</TableHead>
@@ -66,7 +65,6 @@ const UserTable: React.FC<UserTableProps> = ({
       <TableBody>
         {users.map((user) => (
           <TableRow key={user.id}>
-            <TableCell>{user.id}</TableCell>
             <TableCell className="font-medium">{user.username}</TableCell>
             <TableCell>
               <Select

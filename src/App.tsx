@@ -49,7 +49,12 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
-            <Route path="/login" element={<LoginForm />} />
+          <Route
+  path="/login"
+  element={
+    localStorage.getItem('token') ? <Navigate to="/dashboard" replace /> : <LoginForm />
+  }
+/>
             <Route 
               path="/dashboard" 
               element={

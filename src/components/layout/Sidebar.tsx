@@ -1,9 +1,7 @@
-
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { ThemeToggle } from './ThemeToggle';
 import {
   Box,
   LayoutDashboard,
@@ -92,7 +90,6 @@ const Sidebar = () => {
               </div>
               {!collapsed && <span className="text-sm font-medium">{username}</span>}
             </div>
-            {!collapsed && <ThemeToggle />}
           </div>
           <Button 
             variant="outline" 

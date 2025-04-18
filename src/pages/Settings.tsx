@@ -98,16 +98,6 @@ const Settings = () => {
 
       <div className="grid gap-6">
         <Card>
-          <CardHeader>
-            <CardTitle>Account Settings</CardTitle>
-            <CardDescription>Manage your account security settings</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ChangePasswordDialog />
-          </CardContent>
-        </Card>
-
-        <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <div>
               <CardTitle className="text-xl flex items-center gap-2">

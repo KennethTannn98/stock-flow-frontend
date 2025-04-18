@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ExternalLink, Edit, Trash2, ArrowUp, ArrowDown, ArrowUpDown } from 'lucide-react';
+import { ExternalLink, Edit, Trash2, ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationPrevious, PaginationNext } from '@/components/ui/pagination';
 import { cn } from '@/lib/utils';
 
@@ -32,10 +32,10 @@ const ProductTable = ({ products, filteredProducts, getStockStatus, setEditingPr
   };
 
   const getSortIcon = (key) => {
-    if (sortConfig.key !== key) return <ArrowUpDown className="ml-2 h-4 w-4" />;
+    if (sortConfig.key !== key) return <ChevronsUpDown className="ml-2 h-4 w-4" />;
     return sortConfig.direction === 'asc' 
-      ? <ArrowUp className="ml-2 h-4 w-4" /> 
-      : <ArrowDown className="ml-2 h-4 w-4" />;
+      ? <ChevronUp className="ml-2 h-4 w-4" /> 
+      : <ChevronDown className="ml-2 h-4 w-4" />;
   };
 
   const sortedProducts = [...paginatedProducts].sort((a, b) => {

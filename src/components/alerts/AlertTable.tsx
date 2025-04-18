@@ -18,9 +18,6 @@ import {
   Trash2,
   X,
   Check,
-  ArrowUp,
-  ArrowDown,
-  ArrowUpDown,
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -37,6 +34,7 @@ import {
   PaginationNext,
 } from '@/components/ui/pagination';
 import { cn } from '@/lib/utils';
+import { ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react';
 
 const AlertTable = ({ alerts, isLoading, filteredAlerts, formatDate, handleToggleResolved, setSelectedAlert, setIsDeleteDialogOpen }) => {
   const [currentPage, setCurrentPage] = useState(0);
@@ -55,10 +53,10 @@ const AlertTable = ({ alerts, isLoading, filteredAlerts, formatDate, handleToggl
   };
 
   const getSortIcon = (key) => {
-    if (sortConfig.key !== key) return <ArrowUpDown className="ml-2 h-4 w-4" />;
+    if (sortConfig.key !== key) return <ChevronsUpDown className="ml-2 h-4 w-4" />;
     return sortConfig.direction === 'asc' 
-      ? <ArrowUp className="ml-2 h-4 w-4" /> 
-      : <ArrowDown className="ml-2 h-4 w-4" />;
+      ? <ChevronUp className="ml-2 h-4 w-4" /> 
+      : <ChevronDown className="ml-2 h-4 w-4" />;
   };
 
   const sortedAlerts = [...paginatedAlerts].sort((a, b) => {
