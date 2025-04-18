@@ -1,74 +1,52 @@
+
 import React, { useState } from 'react';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
-import { MoreVertical, ArrowDown, ArrowUp, Sliders, ArrowUpDown } from 'lucide-react';
-import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationPrevious, PaginationNext } from '@/components/ui/pagination';
+import TransactionTableHeader from './TransactionTableHeader';
+import TransactionActions from './TransactionActions';
+import { formatDate, getTransactionBadgeColor, getTransactionIcon } from './utils/transactionUtils';
+import { Transaction } from '@/services/api';
 
-const TransactionTable = ({ transactions, isLoading, isError, error, filteredTransactions, handleEditTransaction, deleteMutation }) => {
+interface TransactionTableProps {
+  transactions: Transaction[];
+  isLoading: boolean;
+  isError: boolean;
+  error: Error | null;
+  filteredTransactions: Transaction[];
+  handleEditTransaction: (transaction: Transaction) => void;
+  deleteMutation: any;
+}
+
+const TransactionTable = ({
+  transactions,
+  isLoading,
+  isError,
+  error,
+  filteredTransactions,
+  handleEditTransaction,
+  deleteMutation
+}: TransactionTableProps) => {
   const [currentPage, setCurrentPage] = useState(0);
-  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
+  const [sortConfig, setSortConfig] = useState<{ key: string | null; direction: 'asc' | 'desc' }>({ key: null, direction: 'asc' });
 
   const itemsPerPage = 10;
   const offset = currentPage * itemsPerPage;
   const paginatedTransactions = filteredTransactions.slice(offset, offset + itemsPerPage);
 
-  const formatDate = (dateString) => {
-    try {
-      return format(new Date(dateString), 'dd/MM/yyyy');
-    } catch (err) {
-      return dateString;
-    }
-  };
-
-  const getTransactionBadgeColor = (type) => {
-    switch (type) {
-      case 'IN':
-        return 'bg-green-500/10 text-green-500 border-green-500/20';
-      case 'OUT':
-        return 'bg-amber-500/10 text-amber-500 border-amber-500/20';
-      case 'ADJUSTMENT':
-        return 'bg-blue-500/10 text-blue-500 border-blue-500/20';
-      default:
-        return '';
-    }
-  };
-
-  const getTransactionIcon = (type) => {
-    switch (type) {
-      case 'IN':
-        return <ArrowDown className="h-4 w-4 mr-1" />;
-      case 'OUT':
-        return <ArrowUp className="h-4 w-4 mr-1" />;
-      case 'ADJUSTMENT':
-        return <Sliders className="h-4 w-4 mr-1" />;
-      default:
-        return null;
-    }
-  };
-
-  const handleSort = (key) => {
-    let direction = 'asc';
+  const handleSort = (key: string) => {
+    let direction: 'asc' | 'desc' = 'asc';
     if (sortConfig.key === key && sortConfig.direction === 'asc') {
       direction = 'desc';
     }
     setSortConfig({ key, direction });
   };
 
-  const getSortIcon = (key) => {
-    if (sortConfig.key !== key) return <ArrowUpDown className="ml-2 h-4 w-4" />;
-    return sortConfig.direction === 'asc' 
-      ? <ArrowUp className="ml-2 h-4 w-4" /> 
-      : <ArrowDown className="ml-2 h-4 w-4" />;
-  };
-
   const sortedTransactions = [...paginatedTransactions].sort((a, b) => {
     if (sortConfig.key) {
-      const aValue = a[sortConfig.key];
-      const bValue = b[sortConfig.key];
+      const aValue = a[sortConfig.key as keyof Transaction];
+      const bValue = b[sortConfig.key as keyof Transaction];
       if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
       if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
     }
@@ -78,59 +56,7 @@ const TransactionTable = ({ transactions, isLoading, isError, error, filteredTra
   return (
     <div className="rounded-md border">
       <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead 
-              onClick={() => handleSort('productName')}
-              className="cursor-pointer hover:bg-muted"
-            >
-              <div className="flex items-center">
-                Product {getSortIcon('productName')}
-              </div>
-            </TableHead>
-            <TableHead 
-              onClick={() => handleSort('transactionType')}
-              className="cursor-pointer hover:bg-muted"
-            >
-              <div className="flex items-center">
-                Type {getSortIcon('transactionType')}
-              </div>
-            </TableHead>
-            <TableHead 
-              onClick={() => handleSort('quantity')}
-              className="cursor-pointer hover:bg-muted"
-            >
-              <div className="flex items-center">
-                Quantity {getSortIcon('quantity')}
-              </div>
-            </TableHead>
-            <TableHead 
-              onClick={() => handleSort('reference')}
-              className="hidden md:table-cell cursor-pointer hover:bg-muted"
-            >
-              <div className="flex items-center">
-                Reference {getSortIcon('reference')}
-              </div>
-            </TableHead>
-            <TableHead 
-              onClick={() => handleSort('transactionDate')}
-              className="hidden md:table-cell cursor-pointer hover:bg-muted"
-            >
-              <div className="flex items-center">
-                Transaction Date {getSortIcon('transactionDate')}
-              </div>
-            </TableHead>
-            <TableHead 
-              onClick={() => handleSort('createdBy')}
-              className="hidden md:table-cell cursor-pointer hover:bg-muted"
-            >
-              <div className="flex items-center">
-                Created By {getSortIcon('createdBy')}
-              </div>
-            </TableHead>
-            <TableHead className="text-right">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
+        <TransactionTableHeader sortConfig={sortConfig} onSort={handleSort} />
         <TableBody>
           {isLoading ? (
             <TableRow>
@@ -163,43 +89,16 @@ const TransactionTable = ({ transactions, isLoading, isError, error, filteredTra
                     {transaction.transactionType}
                   </Badge>
                 </TableCell>
-                <TableCell>
-                  {transaction.quantity}
-                </TableCell>
-                <TableCell className="hidden md:table-cell">
-                  {transaction.reference}
-                </TableCell>
-                <TableCell className="hidden md:table-cell">
-                  {formatDate(transaction.transactionDate)}
-                </TableCell>
-                <TableCell className="hidden md:table-cell">
-                  {transaction.createdBy}
-                </TableCell>
+                <TableCell>{transaction.quantity}</TableCell>
+                <TableCell className="hidden md:table-cell">{transaction.reference}</TableCell>
+                <TableCell className="hidden md:table-cell">{formatDate(transaction.transactionDate)}</TableCell>
+                <TableCell className="hidden md:table-cell">{transaction.createdBy}</TableCell>
                 <TableCell className="text-right">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon">
-                        <MoreVertical className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={() => handleEditTransaction(transaction)}>
-                        Edit
-                      </DropdownMenuItem>
-                      <DropdownMenuItem 
-                        className="text-red-600"
-                        onClick={() => {
-                          if (confirm('Are you sure you want to delete this transaction? This action cannot be undone.')) {
-                            deleteMutation.mutate(transaction.id);
-                          }
-                        }}
-                      >
-                        Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  <TransactionActions
+                    transaction={transaction}
+                    onEdit={handleEditTransaction}
+                    onDelete={(id) => deleteMutation.mutate(id)}
+                  />
                 </TableCell>
               </TableRow>
             ))
