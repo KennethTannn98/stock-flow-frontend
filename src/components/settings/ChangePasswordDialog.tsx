@@ -1,20 +1,19 @@
 
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { useMutation } from "@tanstack/react-query";
-import { toast } from "sonner";
-import { Key } from "lucide-react";
-import { changePassword } from "@/services/api";
-import { Button } from "@/components/ui/button";
+import React from 'react';
+import { z } from 'zod';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation } from '@tanstack/react-query';
+import { changePassword } from '@/services/api';
+import { useToast } from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+  DialogFooter,
+} from '@/components/ui/dialog';
 import {
   Form,
   FormControl,
@@ -22,57 +21,70 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
 
 const formSchema = z.object({
-  currentPassword: z.string().min(1, "Current password is required"),
-  newPassword: z.string().min(8, "New password must be at least 8 characters"),
-  confirmPassword: z.string().min(1, "Please confirm your new password"),
+  currentPassword: z.string().min(1, { message: 'Current password is required' }),
+  newPassword: z.string().min(8, { message: 'New password must be at least 8 characters' }),
+  confirmPassword: z.string().min(8, { message: 'Password confirmation is required' }),
 }).refine((data) => data.newPassword === data.confirmPassword, {
-  message: "Passwords do not match",
-  path: ["confirmPassword"],
+  message: 'Passwords do not match',
+  path: ['confirmPassword'],
 });
 
-const ChangePasswordDialog = () => {
-  const [open, setOpen] = useState(false);
-  
-  const form = useForm<z.infer<typeof formSchema>>({
+type FormValues = z.infer<typeof formSchema>;
+
+interface ChangePasswordDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+export const ChangePasswordDialog = ({ open, onOpenChange }: ChangePasswordDialogProps) => {
+  const { toast } = useToast();
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      currentPassword: "",
-      newPassword: "",
-      confirmPassword: "",
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: '',
     },
   });
 
-  const mutation = useMutation({
-    mutationFn: (data: { currentPassword: string; newPassword: string }) => 
-      changePassword(data),
+  const passwordMutation = useMutation({
+    mutationFn: (data: { currentPassword: string; newPassword: string }) => {
+      return changePassword({
+        currentPassword: data.currentPassword,
+        newPassword: data.newPassword
+      });
+    },
     onSuccess: () => {
-      toast.success("Password changed successfully");
-      setOpen(false);
+      toast({
+        title: 'Password changed',
+        description: 'Your password has been changed successfully.',
+      });
       form.reset();
+      onOpenChange(false);
     },
-    onError: (error) => {
-      toast.error("Failed to change password. Please verify your current password.");
-      console.error("Error changing password:", error);
+    onError: (error: Error) => {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: `Failed to change password: ${error.message}`,
+      });
     },
   });
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    const { confirmPassword, ...passwordData } = values;
-    mutation.mutate(passwordData);
+  const onSubmit = (formData: FormValues) => {
+    const { currentPassword, newPassword } = formData;
+    passwordMutation.mutate({ 
+      currentPassword, 
+      newPassword 
+    });
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline">
-          <Key className="mr-2 h-4 w-4" />
-          Change Password
-        </Button>
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Change Password</DialogTitle>
@@ -118,9 +130,14 @@ const ChangePasswordDialog = () => {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full" disabled={mutation.isPending}>
-              {mutation.isPending ? "Changing Password..." : "Change Password"}
-            </Button>
+            <DialogFooter className="pt-4">
+              <Button 
+                type="submit"
+                disabled={passwordMutation.isPending}
+              >
+                {passwordMutation.isPending ? 'Changing...' : 'Change Password'}
+              </Button>
+            </DialogFooter>
           </form>
         </Form>
       </DialogContent>

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
@@ -46,6 +47,10 @@ const ProductTable = ({ products, filteredProducts, getStockStatus, setEditingPr
     }
     return 0;
   });
+
+  const handleDelete = (id) => {
+    setDeleteConfirmId(id);
+  };
 
   return (
     <div className="rounded-md border">
@@ -138,7 +143,7 @@ const ProductTable = ({ products, filteredProducts, getStockStatus, setEditingPr
                       variant="ghost" 
                       size="icon"
                       className="text-destructive hover:text-destructive"
-                      onClick={() => setDeleteConfirmId(product.id)}
+                      onClick={() => handleDelete(product.id)}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>

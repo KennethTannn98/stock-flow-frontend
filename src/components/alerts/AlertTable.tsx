@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import {
   Table,
@@ -69,6 +70,11 @@ const AlertTable = ({ alerts, isLoading, filteredAlerts, formatDate, handleToggl
     }
     return 0;
   });
+
+  const handleDeleteAlert = (alert) => {
+    setSelectedAlert(alert);
+    setIsDeleteDialogOpen(true);
+  };
 
   return (
     <div className="rounded-md border">
@@ -210,10 +216,7 @@ const AlertTable = ({ alerts, isLoading, filteredAlerts, formatDate, handleToggl
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         className="text-destructive focus:text-destructive gap-2"
-                        onClick={() => {
-                          setSelectedAlert(alert);
-                          setIsDeleteDialogOpen(true);
-                        }}
+                        onClick={() => handleDeleteAlert(alert)}
                       >
                         <Trash2 className="h-4 w-4" />
                         Delete
