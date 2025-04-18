@@ -15,7 +15,7 @@ import { ExternalLink, Edit, Trash2, ChevronUp, ChevronDown, ChevronsUpDown } fr
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationPrevious, PaginationNext } from '@/components/ui/pagination';
 import { cn } from '@/lib/utils';
 
-const ProductTable = ({ products, filteredProducts, getStockStatus, setEditingProduct, setDeleteConfirmId, deleteMutation }) => {
+const ProductTable = ({ products, filteredProducts, getStockStatus, setEditingProduct, setDeleteConfirmId}) => {
   const [currentPage, setCurrentPage] = useState(0);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
 

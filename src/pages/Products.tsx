@@ -1,3 +1,4 @@
+// Products.tsx
 import { useCallback, useEffect, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
@@ -27,14 +28,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"; // <-- Import AlertDialog components
+import {
   Product,
   ProductCreate,
   ProductUpdate,
-  getProducts, 
-  createProduct, 
+  getProducts,
+  createProduct,
   updateProduct,
-  deleteProduct 
+  deleteProduct
 } from '@/services/api';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -66,7 +77,7 @@ const productToFormValues = (product?: Product): ProductFormValues => {
   };
 };
 
-// Available product categories
+// Available product categories (can be dynamic as well, but good for the form dropdown)
 const CATEGORIES = [
   "GPU", "CPU", "MOBO", "RAM", "SSD", "PSU", "FAN", "CASE", "PERI"
 ];
@@ -77,7 +88,7 @@ const Products = () => {
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-  const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null); // State to hold ID for delete confirmation
 
   // Fetch products
   const { data: products = [], isLoading, error } = useQuery({
@@ -133,14 +144,15 @@ const Products = () => {
 
   // Delete product mutation
   const deleteMutation = useMutation({
-    mutationFn: deleteProduct,
+    mutationFn: deleteProduct, // The function to call (expects product ID)
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
       toast.success('Product deleted successfully');
-      setDeleteConfirmId(null);
+      setDeleteConfirmId(null); // Close the confirmation dialog on success
     },
     onError: (error) => {
       toast.error(`Error deleting product: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      setDeleteConfirmId(null); // Close the confirmation dialog on error as well
     },
   });
 
@@ -149,7 +161,7 @@ const Products = () => {
     resolver: zodResolver(productSchema),
     defaultValues: productToFormValues(),
   });
-  
+
   // Reset form when editing product changes
   useEffect(() => {
     if (editingProduct) {
@@ -170,14 +182,15 @@ const Products = () => {
 
   // Filter products based on search query and category
   const filteredProducts = useCallback(() => {
+    if (!products) return []; // Handle initial loading state
     return products.filter(product => {
-      const matchesSearch = 
-        product.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      const matchesSearch =
+        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         product.sku.toLowerCase().includes(searchQuery.toLowerCase());
-      
-      const matchesCategory = 
+
+      const matchesCategory =
         categoryFilter === 'all' || product.category.toLowerCase() === categoryFilter.toLowerCase();
-      
+
       return matchesSearch && matchesCategory;
     });
   }, [products, searchQuery, categoryFilter]);
@@ -188,15 +201,37 @@ const Products = () => {
     setCategoryFilter('all');
   };
 
-  // Calculate unique categories from actual data
+  // Calculate unique categories from actual data for the filter dropdown
   const uniqueCategories = [...new Set(products.map(p => p.category))];
-  
+
   // Determine stock status
   const getStockStatus = (product: Product) => {
     if (product.quantity <= 0) return { label: 'Out of Stock', className: 'border-red-500 text-red-500' };
     if (product.quantity <= product.reorder) return { label: 'Low Stock', className: 'border-yellow-500 text-yellow-500' };
     return { label: 'In Stock', className: 'border-green-500 text-green-500' };
   };
+
+  // --- Delete Confirmation Handlers ---
+  const handleDeleteConfirm = () => {
+    if (deleteConfirmId !== null) {
+      deleteMutation.mutate(deleteConfirmId);
+      // No need to setDeleteConfirmId(null) here; onSuccess/onError handles it.
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteConfirmId(null); // Just close the dialog
+  };
+  // --- End Delete Confirmation Handlers ---
+
+
+  if (isLoading) {
+      return <div>Loading products...</div>; // Or a spinner component
+  }
+
+  if (error) {
+      return <div className="text-red-500">Error loading products: {error.message}</div>;
+  }
 
   return (
     <>
@@ -237,17 +272,18 @@ const Products = () => {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Categories</SelectItem>
-                    {uniqueCategories.map(category => (
+                    {/* Use unique categories derived from data */}
+                    {uniqueCategories.sort().map(category => (
                       <SelectItem key={category} value={category.toLowerCase()}>{category}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
               <div className="flex items-end">
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   onClick={resetFilters}
-                  className="h-10"
+                  className="h-10" // Ensure button aligns with inputs
                 >
                   <RefreshCcw className="h-4 w-4 mr-2" /> Reset Filters
                 </Button>
@@ -258,29 +294,58 @@ const Products = () => {
 
         <Card>
           <CardContent className="p-0">
+            {/* Pass setDeleteConfirmId to the table */}
             <ProductTable
               products={products}
               filteredProducts={filteredProducts()}
               getStockStatus={getStockStatus}
               setEditingProduct={setEditingProduct}
-              setDeleteConfirmId={setDeleteConfirmId}
-              deleteMutation={deleteMutation}
+              setDeleteConfirmId={setDeleteConfirmId} // Pass the setter function
+              // deleteMutation prop is no longer needed here
             />
           </CardContent>
         </Card>
       </div>
 
+      {/* Add/Edit Product Dialog */}
       <ProductDialog
         open={isAddDialogOpen || !!editingProduct}
         onClose={() => {
           setIsAddDialogOpen(false);
           setEditingProduct(null);
+          form.reset(productToFormValues()); // Reset form on close
         }}
         onSubmit={onSubmit}
         form={form}
-        categories={CATEGORIES}
+        categories={CATEGORIES} // Use predefined categories for the form dropdown
         isEditing={!!editingProduct}
       />
+
+      {/* --- Delete Confirmation Dialog --- */}
+      <AlertDialog open={deleteConfirmId !== null} onOpenChange={(isOpen) => !isOpen && handleDeleteCancel()}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the product
+              and remove it from inventory records.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleDeleteCancel} disabled={deleteMutation.isPending}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              disabled={deleteMutation.isPending} // Disable button while deleting
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90" // Style as destructive action
+            >
+              {deleteMutation.isPending ? 'Deleting...' : 'Delete'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      {/* --- End Delete Confirmation Dialog --- */}
     </>
   );
 };

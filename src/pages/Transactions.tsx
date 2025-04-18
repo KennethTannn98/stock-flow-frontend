@@ -259,7 +259,7 @@ const Transactions: React.FC = () => { // Use React.FC for functional components
   const formatDate = (dateString: string) => {
     try {
       // Ensure parsing is robust, might need date-fns-tz if timezones are complex
-      return format(parseISO(dateString), 'dd MMM yyyy HH:mm'); // Example format
+      return format(parseISO(dateString), 'dd/MM/yyyy'); // Example format
     } catch (err) {
       console.warn("Failed to format date:", dateString, err);
       return dateString; // Fallback
@@ -292,7 +292,7 @@ const Transactions: React.FC = () => { // Use React.FC for functional components
       <div className="container mx-auto px-4 py-6 space-y-6">
         {/* Header */}
         <div className="flex flex-wrap justify-between items-center gap-4">
-          <h1 className="text-2xl font-semibold">Inventory Transactions</h1>
+          <h1 className="text-2xl font-semibold">Transactions</h1>
           <Button onClick={handleAddNewClick}>
             <Plus className="h-4 w-4 mr-2" /> Add Transaction
           </Button>

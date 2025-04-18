@@ -214,7 +214,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                 <TableCell>
                   <Badge variant="outline" className={cn("flex items-center w-fit gap-1", getTransactionBadgeColor(transaction.transactionType))}>
                     {getTransactionIcon(transaction.transactionType)}
-                    {transaction.transactionType === 'ADJUSTMENT' ? 'Adjust' : transaction.transactionType}
+                    {transaction.transactionType === 'ADJUSTMENT' ? 'ADJ' : transaction.transactionType}
                   </Badge>
                 </TableCell>
                 <TableCell className="text-right">
