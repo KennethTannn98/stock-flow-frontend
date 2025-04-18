@@ -1,5 +1,4 @@
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -17,6 +16,8 @@ import {
   Key
 } from 'lucide-react';
 import { toast } from '@/components/ui/sonner';
+import { useQuery } from '@tanstack/react-query';
+import { getAlerts } from '@/services/api';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -33,11 +34,23 @@ const Sidebar = () => {
   const navigate = useNavigate();
   const username = localStorage.getItem('username') || 'Admin';
 
+  const { data: alerts = [] } = useQuery({
+    queryKey: ['alerts'],
+    queryFn: getAlerts,
+  });
+
+  const unresolvedCount = alerts.filter(alert => !alert.resolved).length;
+
   const navItems = [
     { label: 'Dashboard', icon: LayoutDashboard, path: '/Dashboard' },
     { label: 'Products', icon: Box, path: '/Products' },
     { label: 'Transactions', icon: ClipboardList, path: '/Transactions' },
-    { label: 'Alerts', icon: AlertTriangle, path: '/alerts' },
+    { 
+      label: 'Alerts', 
+      icon: AlertTriangle, 
+      path: '/alerts',
+      badge: unresolvedCount > 0 ? unresolvedCount : undefined
+    },
     { label: 'Settings', icon: Settings, path: '/settings' },
   ];
 
@@ -79,12 +92,20 @@ const Sidebar = () => {
               key={item.label}
               to={item.path}
               className={cn(
-                'flex items-center gap-3 px-3 py-2 rounded-md text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors',
+                'flex items-center gap-3 px-3 py-2 rounded-md text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors relative',
                 item.path === location.pathname && 'bg-sidebar-accent text-sidebar-accent-foreground font-medium'
               )}
             >
               <item.icon className="h-5 w-5" />
               {!collapsed && <span>{item.label}</span>}
+              {item.badge && (
+                <div className={cn(
+                  "absolute right-2 top-1/2 -translate-y-1/2 min-w-[20px] h-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center px-1",
+                  collapsed && "right-1 w-5"
+                )}>
+                  {item.badge}
+                </div>
+              )}
             </Link>
           ))}
         </nav>
