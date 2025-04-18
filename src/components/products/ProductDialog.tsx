@@ -57,7 +57,7 @@ const ProductDialog = ({ open, onClose, onSubmit, form, categories, isEditing })
                 <FormItem>
                   <FormLabel>SKU</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter SKU" {...field} />
+                    <Input placeholder="Enter product SKU" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

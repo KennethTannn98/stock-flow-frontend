@@ -34,7 +34,7 @@ const AlertDialog = ({ open, onClose, onSubmit, form }) => {
               name="productSku"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Product SKU</FormLabel>
+                  <FormLabel>SKU</FormLabel>
                   <FormControl>
                     <Input placeholder="Enter product SKU" {...field} />
                   </FormControl>

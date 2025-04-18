@@ -52,34 +52,23 @@ const TransactionDialog = ({
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="productId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Product</FormLabel>
-                  <Select
-                    disabled={isEditing}
-                    onValueChange={(value) => field.onChange(Number(value))}
-                    value={field.value.toString()}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select product" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {products.map((product) => (
-                        <SelectItem key={product.id} value={product.id.toString()}>
-                          {product.name} ({product.sku})
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+          <FormField
+  control={form.control}
+  name="ProductSku"
+  render={({ field }) => (
+    <FormItem>
+      <FormLabel>SKU</FormLabel>
+      <FormControl>
+        <Input
+          placeholder="Enter product SKU"
+          {...field}
+        />
+      </FormControl>
+      <FormMessage />
+    </FormItem>
+  )}
+/>
+
 
             <FormField
               control={form.control}

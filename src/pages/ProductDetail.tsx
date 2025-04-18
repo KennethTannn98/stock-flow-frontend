@@ -638,14 +638,14 @@ const ProductDetail = () => {
                   </div>
                 )}
               </CardContent>
-              <CardFooter className="border-t bg-muted/50">
-                <Button variant="outline" size="sm" asChild>
-                  <Link to="/transactions">
-                    <PlusCircle className="mr-2 h-4 w-4" />
-                    New Transaction
-                  </Link>
-                </Button>
-              </CardFooter>
+              <CardFooter className="pt-4 border-t bg-muted/50">
+  <Button variant="outline" size="sm" asChild>
+    <Link to="/transactions">
+      <PlusCircle className="mr-2 h-4 w-4" />
+      New Transaction
+    </Link>
+  </Button>
+</CardFooter>
             </Card>
           </TabsContent>
         </Tabs>
