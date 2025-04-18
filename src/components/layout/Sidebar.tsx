@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -13,11 +14,21 @@ import {
   ChevronRight,
   AlertTriangle,
   LogOut,
+  Key
 } from 'lucide-react';
 import { toast } from '@/components/ui/sonner';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import ChangePasswordDialog from '@/components/settings/ChangePasswordDialog';
 
 const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
+  const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const username = localStorage.getItem('username') || 'Admin';
@@ -81,30 +92,36 @@ const Sidebar = () => {
 
       <div className="p-4 border-t border-border">
         <div className="flex flex-col gap-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-sidebar-accent flex items-center justify-center">
-                <span className="font-medium text-sidebar-accent-foreground text-sm">
-                  {username.charAt(0).toUpperCase()}
-                </span>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <div className="flex items-center gap-3 cursor-pointer hover:bg-sidebar-accent rounded-md p-2">
+                <div className="w-8 h-8 rounded-full bg-sidebar-accent flex items-center justify-center">
+                  <span className="font-medium text-sidebar-accent-foreground text-sm">
+                    {username.charAt(0).toUpperCase()}
+                  </span>
+                </div>
+                {!collapsed && <span className="text-sm font-medium">{username}</span>}
               </div>
-              {!collapsed && <span className="text-sm font-medium">{username}</span>}
-            </div>
-          </div>
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={handleLogout}
-            className={cn(
-              "flex items-center justify-center",
-              collapsed ? "w-8 h-8 p-0" : "w-full"
-            )}
-          >
-            <LogOut className="h-4 w-4" />
-            {!collapsed && <span className="ml-2">Logout</span>}
-          </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem onClick={() => setIsPasswordDialogOpen(true)}>
+                <Key className="mr-2 h-4 w-4" />
+                Change Password
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleLogout}>
+                <LogOut className="mr-2 h-4 w-4" />
+                Logout
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
+
+      <ChangePasswordDialog 
+        open={isPasswordDialogOpen}
+        onOpenChange={setIsPasswordDialogOpen}
+      />
     </div>
   );
 };
