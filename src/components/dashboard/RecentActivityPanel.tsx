@@ -36,7 +36,7 @@ const RecentActivityPanel = () => {
     <Card className="col-span-full lg:col-span-1">
       <CardHeader className="pb-2">
         <CardTitle className="flex items-center gap-2">
-          <Clock className="h-5 w-5" /> Recent Activity
+          <Clock className="h-5 w-5" /> Today's Activity
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -100,7 +100,7 @@ const RecentActivityPanel = () => {
             <div className="flex flex-col items-center justify-center py-8 text-center">
               <Package className="h-8 w-8 text-muted-foreground/50 mb-2" />
               <p className="text-sm text-muted-foreground">
-                No recent activity found
+                No activity found today.
               </p>
             </div>
           )}

@@ -237,7 +237,7 @@ const Transactions: React.FC = () => {
         {/* Header with Description */}
         <div className="flex flex-col gap-1 md:flex-row md:justify-between md:items-center">
           <div>
-            <h1 className="text-2xl font-semibold">Transactions</h1>
+            <h1 className="text-3xl font-bold">Transactions</h1>
             <p className="text-muted-foreground">
               Manage inventory transactions including stock ins, outs, and adjustments.
             </p>

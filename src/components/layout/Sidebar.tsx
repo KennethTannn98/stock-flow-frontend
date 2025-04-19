@@ -1,4 +1,4 @@
-// sidebar.tsx
+// Sidebar.tsx
 import { useState, useEffect, useMemo } from 'react'; // Added useMemo
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -98,28 +98,6 @@ const Sidebar = () => {
     // Add the Settings item conditionally based on isAdmin flag
     ...(isAdmin ? [{ label: 'Settings', icon: Settings, path: '/settings' }] : [])
   ];
-
-  // Filter navItems (or build dynamically as above)
-  // If you prefer filtering:
-  /*
-  const navItems = useMemo(() => {
-     const allItems = [
-       { label: 'Dashboard', icon: LayoutDashboard, path: '/Dashboard' },
-       { label: 'Products', icon: Box, path: '/Products' },
-       { label: 'Transactions', icon: ClipboardList, path: '/Transactions' },
-       {
-         label: 'Alerts',
-         icon: AlertTriangle,
-         path: '/alerts',
-         badge: unresolvedCount > 0 ? unresolvedCount : undefined
-       },
-       { label: 'Settings', icon: Settings, path: '/settings', adminOnly: true }, // Add a flag
-     ];
-
-     return allItems.filter(item => !item.adminOnly || isAdmin); // Keep if not adminOnly OR if user is admin
-
-  }, [isAdmin, unresolvedCount]); // Re-filter if isAdmin or badge count changes
-  */
 
   const handleLogout = () => {
     localStorage.removeItem('token');

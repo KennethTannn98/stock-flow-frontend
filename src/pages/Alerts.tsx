@@ -5,9 +5,7 @@ import { format, parseISO } from 'date-fns';
 import {
   Search,
   Plus,
-  // Filter, // Filter icon wasn't used, removed for clarity
   RefreshCcw,
-  // Bell // Bell icon wasn't used, removed for clarity
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Alert, getAlerts, updateAlert, deleteAlert, createAlert, AlertCreate, AlertUpdate } from '@/services/api';
@@ -29,7 +27,7 @@ import {
 } from '@/components/ui/select';
 import { useForm } from 'react-hook-form';
 import AlertTable from '@/components/alerts/AlertTable';
-import AddAlertDialog from '@/components/alerts/AlertDialog'; // Renamed import for clarity, assuming AlertDialog.tsx is the Add dialog
+import AddAlertDialog from '@/components/alerts/AlertDialog'; // Renamed import for clarity
 
 // --- Import AlertDialog components for Delete ---
 import {
@@ -100,8 +98,8 @@ const Alerts = () => {
     onError: (error) => {
       toast.error('Failed to delete alert');
       console.error('Error deleting alert:', error);
-      // Optionally keep the dialog open on error:
-      // setIsDeleteDialogOpen(true);
+      // Optionally keep the dialog open on error by commenting out the line below
+      // setIsDeleteDialogOpen(false);
     },
   });
 
@@ -118,11 +116,8 @@ const Alerts = () => {
   });
 
   const onSubmitAddAlert = (data: AlertCreate) => {
-    // Potentially fetch productName/productId based on SKU before mutating
-    // For now, assumes API handles this or they aren't strictly needed for creation via SKU
     createMutation.mutate({
       ...data,
-      // Ensure default values are set if not provided by form (like resolved)
       resolved: data.resolved || false,
       createdBy: data.createdBy || 'system', // Replace 'system' with actual user context if possible
       updatedBy: data.updatedBy || 'system', // Replace 'system' with actual user context if possible
@@ -140,7 +135,14 @@ const Alerts = () => {
     });
   };
 
-  // Function to handle delete confirmation (called by the confirmation dialog)
+  // Function to handle opening the delete confirmation dialog
+  // This is passed to AlertTable via the `onDeleteClick` prop
+  const handleDeleteAlertClick = (alert: Alert) => {
+    setSelectedAlert(alert); // Set the alert to be deleted
+    setIsDeleteDialogOpen(true); // Open the confirmation dialog
+  };
+
+  // Function to handle the actual delete action (called by the confirmation dialog)
   const handleDeleteConfirm = () => {
     if (selectedAlert) {
       deleteMutation.mutate(selectedAlert.id);
@@ -151,32 +153,32 @@ const Alerts = () => {
   const filteredAlerts = alerts.filter((alert) => {
     const lowerSearchQuery = searchQuery.toLowerCase();
     const matchesSearch =
-      alert.productName?.toLowerCase().includes(lowerSearchQuery) || // Added null check
-      alert.productSku?.toLowerCase().includes(lowerSearchQuery); // Added null check
+      alert.productName?.toLowerCase().includes(lowerSearchQuery) ||
+      alert.productSku?.toLowerCase().includes(lowerSearchQuery);
 
     if (statusFilter === 'all') return matchesSearch;
     if (statusFilter === 'resolved') return matchesSearch && alert.resolved;
     if (statusFilter === 'unresolved') return matchesSearch && !alert.resolved;
 
-    return matchesSearch; // Default case (should be covered by 'all')
+    return matchesSearch;
   });
 
   // Format date for display
   const formatDate = (dateString: string | null | undefined): string => {
     if (!dateString) return 'N/A';
     try {
-      // Attempt to parse as ISO string first
       const parsedDate = parseISO(dateString);
-      return format(parsedDate, 'dd/MM/yyyy')
+      // Use a simpler format, adjust as needed
+      return format(parsedDate, 'dd/MM/yyyy HH:mm');
     } catch (e) {
-      // If parsing fails, try creating a Date object directly (less reliable)
+       console.error("Error parsing date:", dateString, e);
+      // Fallback for invalid date strings
       try {
         const dateObj = new Date(dateString);
-        // Check if the date object is valid
         if (!isNaN(dateObj.getTime())) {
           return format(dateObj, 'dd/MM/yyyy HH:mm');
         } else {
-          return dateString; // Return original string if invalid
+          return dateString; // Return original string if completely invalid
         }
       } catch (innerError) {
         return dateString; // Fallback to original string on any error
@@ -185,18 +187,12 @@ const Alerts = () => {
   };
 
 
-  // This function is passed to AlertTable and called when the delete icon is clicked
-  const handleDeleteAlertClick = (alert: Alert) => {
-    setSelectedAlert(alert);
-    setIsDeleteDialogOpen(true); // Open the *confirmation* dialog
-  };
-
   return (
     <>
       <div className="container mx-auto px-4 py-6">
         <div className="flex justify-between items-center mb-6">
           <div>
-            <h1 className="text-2xl font-semibold">Alerts</h1>
+            <h1 className="text-3xl font-bold">Alerts</h1>
             <p className="text-muted-foreground">Monitor and manage inventory alerts</p>
           </div>
           <Button onClick={() => setIsAddDialogOpen(true)}>
@@ -246,7 +242,7 @@ const Alerts = () => {
                     setSearchQuery('');
                     setStatusFilter('unresolved');
                   }}
-                  className="h-10 w-full md:w-auto" // Adjusted width for responsiveness
+                  className="h-10 w-full md:w-auto"
                 >
                   <RefreshCcw className="h-4 w-4 mr-2" /> Reset Filters
                 </Button>
@@ -257,15 +253,14 @@ const Alerts = () => {
 
         <Card>
           <CardContent className="p-0">
+            {/* Pass the correct props to AlertTable */}
             <AlertTable
-              alerts={alerts} // Pass original alerts for potential full list needs
+              alerts={alerts} // Pass original alerts if needed by table internally
               isLoading={isLoading}
               filteredAlerts={filteredAlerts} // Pass filtered list for display
               formatDate={formatDate}
               handleToggleResolved={handleToggleResolved}
-              // Pass the function that opens the *delete confirmation* dialog
-              setSelectedAlert={setSelectedAlert} // Keep this if AlertTable uses it directly elsewhere
-              setIsDeleteDialogOpen={setIsDeleteDialogOpen} // Pass the setter for the delete dialog
+              onDeleteClick={handleDeleteAlertClick} // Pass the handler function
             />
           </CardContent>
         </Card>
@@ -278,7 +273,7 @@ const Alerts = () => {
           setIsAddDialogOpen(false);
           form.reset(); // Reset form when closing manually too
         }}
-        onSubmit={onSubmitAddAlert} // Use the specific handler for adding
+        onSubmit={onSubmitAddAlert}
         form={form}
       />
 

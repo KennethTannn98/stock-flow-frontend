@@ -89,8 +89,7 @@ const Products = () => {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-  const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null); // State to hold ID for delete confirmation
-
+  const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null); 
   // Fetch products
   const { data: products = [], isLoading, error } = useQuery({
     queryKey: ['products'],
@@ -252,15 +251,16 @@ const Products = () => {
   return (
     <>
       <div className="container mx-auto px-4 py-6">
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h1 className="text-2xl font-semibold">Products</h1>
-            <p className="text-muted-foreground">Manage your product inventory</p>
-          </div>
-          <Button onClick={() => setIsAddDialogOpen(true)}>
-            <Plus className="h-4 w-4 mr-2" /> Add Product
-          </Button>
-        </div>
+      <div className="flex justify-between items-center mb-6">
+  <div>
+    {/* Apply the consistent style */}
+    <h1 className="text-3xl font-bold">Products</h1> {/* Changed classes */}
+    <p className="text-muted-foreground">Manage your product inventory</p>
+  </div>
+  <Button onClick={() => setIsAddDialogOpen(true)}>
+    <Plus className="h-4 w-4 mr-2" /> Add Product
+  </Button>
+</div>
 
         <Card className="mb-6">
           <CardHeader className="pb-3">
@@ -330,8 +330,7 @@ const Products = () => {
               filteredProducts={filteredProducts()}
               getStockStatus={getStockStatus}
               setEditingProduct={setEditingProduct}
-              setDeleteConfirmId={setDeleteConfirmId} // Pass the setter function
-              // deleteMutation prop is no longer needed here
+              setDeleteConfirmId={setDeleteConfirmId}
             />
           </CardContent>
         </Card>
