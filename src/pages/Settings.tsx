@@ -1,6 +1,13 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
   AlertDialog,
@@ -22,6 +29,7 @@ import {
 import { Plus, Users } from 'lucide-react';
 import UserTable from '@/components/settings/UserTable';
 import UserDialog from '@/components/settings/UserDialog';
+import ChangePasswordDialog from '@/components/settings/ChangePasswordDialog';
 
 const Settings = () => {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
@@ -98,32 +106,40 @@ const Settings = () => {
   };
 
   return (
-    <div className="h-full flex-1 flex-col space-y-8 p-8 md:flex">
-      <div className="flex items-center justify-between space-y-2">
+    <div className="container mx-auto px-4 py-6">
+      <div className="flex justify-between items-center mb-6">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight">Settings</h2>
-          <p className="text-muted-foreground">
-            Manage users and system configuration
-          </p>
-        </div>
-        <div className="flex items-center space-x-2">
-          <Button onClick={() => setIsAddDialogOpen(true)}>
-            <Plus className="mr-2 h-4 w-4" /> Add User
-          </Button>
+          <h1 className="text-3xl font-bold">Settings</h1>
+          <p className="text-muted-foreground">Manage users and system configuration</p>
         </div>
       </div>
+      
 
-      <div className="space-y-4">
-        <div className="flex items-center gap-2 text-lg font-semibold">
-          <Users className="h-5 w-5" />
-          User Management
-        </div>
-        <UserTable 
-          users={users}
-          isLoading={isLoading}
-          onDeleteUser={handleDeleteUser}
-          onUpdateRole={handleUpdateRole}
-        />
+      <div className="grid gap-6">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <div>
+              <CardTitle className="text-xl flex items-center gap-2">
+                <Users className="h-5 w-5" />
+                User Management
+              </CardTitle>
+              <CardDescription>
+                Create, update, or delete user accounts
+              </CardDescription>
+            </div>
+            <Button onClick={() => setIsAddDialogOpen(true)}>
+              <Plus className="h-4 w-4 mr-2" /> Add User
+            </Button>
+          </CardHeader>
+          <CardContent>
+            <UserTable 
+              users={users}
+              isLoading={isLoading}
+              onDeleteUser={handleDeleteUser}
+              onUpdateRole={handleUpdateRole}
+            />
+          </CardContent>
+        </Card>
       </div>
 
       <UserDialog 
