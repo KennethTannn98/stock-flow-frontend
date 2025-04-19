@@ -86,6 +86,7 @@ const Products = () => {
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null); // State to hold ID for delete confirmation
@@ -180,30 +181,6 @@ const Products = () => {
     }
   };
 
-  // Filter products based on search query and category
-  const filteredProducts = useCallback(() => {
-    if (!products) return []; // Handle initial loading state
-    return products.filter(product => {
-      const matchesSearch =
-        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.sku.toLowerCase().includes(searchQuery.toLowerCase());
-
-      const matchesCategory =
-        categoryFilter === 'all' || product.category.toLowerCase() === categoryFilter.toLowerCase();
-
-      return matchesSearch && matchesCategory;
-    });
-  }, [products, searchQuery, categoryFilter]);
-
-  // Reset filters
-  const resetFilters = () => {
-    setSearchQuery('');
-    setCategoryFilter('all');
-  };
-
-  // Calculate unique categories from actual data for the filter dropdown
-  const uniqueCategories = [...new Set(products.map(p => p.category))];
-
   // Determine stock status
   const getStockStatus = (product: Product) => {
     if (product.quantity <= 0) return { 
@@ -219,6 +196,36 @@ const Products = () => {
       className: 'bg-green-100 text-green-800 hover:bg-green-100 border-0' 
     };
   };
+
+  // Filter products based on search query, category, and status
+  const filteredProducts = useCallback(() => {
+    if (!products) return []; // Handle initial loading state
+    return products.filter(product => {
+      const matchesSearch =
+        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.sku.toLowerCase().includes(searchQuery.toLowerCase());
+
+      const matchesCategory =
+        categoryFilter === 'all' || product.category.toLowerCase() === categoryFilter.toLowerCase();
+      
+      // Add status filtering
+      const status = getStockStatus(product).label;
+      const matchesStatus =
+        statusFilter === 'all' || status.toLowerCase() === statusFilter.toLowerCase();
+
+      return matchesSearch && matchesCategory && matchesStatus;
+    });
+  }, [products, searchQuery, categoryFilter, statusFilter]);
+
+  // Reset filters
+  const resetFilters = () => {
+    setSearchQuery('');
+    setCategoryFilter('all');
+    setStatusFilter('all');
+  };
+
+  // Calculate unique categories from actual data for the filter dropdown
+  const uniqueCategories = [...new Set(products.map(p => p.category))];
 
   // --- Delete Confirmation Handlers ---
   const handleDeleteConfirm = () => {
@@ -260,7 +267,7 @@ const Products = () => {
             <CardTitle className="text-lg">Filters</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
                 <label className="text-sm font-medium mb-1 block text-muted-foreground">Search</label>
                 <div className="relative">
@@ -285,6 +292,20 @@ const Products = () => {
                     {uniqueCategories.sort().map(category => (
                       <SelectItem key={category} value={category.toLowerCase()}>{category}</SelectItem>
                     ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="text-sm font-medium mb-1 block text-muted-foreground">Status</label>
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="All Statuses" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Statuses</SelectItem>
+                    <SelectItem value="available">Available</SelectItem>
+                    <SelectItem value="low">Low</SelectItem>
+                    <SelectItem value="oos">OOS</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

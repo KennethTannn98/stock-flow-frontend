@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
@@ -40,10 +39,19 @@ const ProductTable = ({ products, filteredProducts, getStockStatus, setEditingPr
 
   const sortedProducts = [...paginatedProducts].sort((a, b) => {
     if (sortConfig.key) {
-      const aValue = a[sortConfig.key];
-      const bValue = b[sortConfig.key];
-      if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
-      if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
+      if (sortConfig.key === 'status') {
+        // Special handling for status sorting
+        const aStatus = getStockStatus(a).label;
+        const bStatus = getStockStatus(b).label;
+        if (aStatus < bStatus) return sortConfig.direction === 'asc' ? -1 : 1;
+        if (aStatus > bStatus) return sortConfig.direction === 'asc' ? 1 : -1;
+      } else {
+        // Regular sorting for other fields
+        const aValue = a[sortConfig.key];
+        const bValue = b[sortConfig.key];
+        if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
+        if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
+      }
     }
     return 0;
   });
@@ -105,7 +113,14 @@ const ProductTable = ({ products, filteredProducts, getStockStatus, setEditingPr
                 Price {getSortIcon('price')}
               </div>
             </TableHead>
-            <TableHead>Status</TableHead>
+            <TableHead 
+              onClick={() => handleSort('status')}
+              className="cursor-pointer hover:bg-muted"
+            >
+              <div className="flex items-center">
+                Status {getSortIcon('status')}
+              </div>
+            </TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -155,10 +170,12 @@ const ProductTable = ({ products, filteredProducts, getStockStatus, setEditingPr
         </TableBody>
       </Table>
       <Pagination className="mt-2 pb-4">
-        <PaginationPrevious
-          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 0))}
-        />
         <PaginationContent>
+          <PaginationItem>
+            <PaginationPrevious
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 0))}
+            />
+          </PaginationItem>
           {Array.from({ length: Math.ceil(filteredProducts.length / itemsPerPage) }, (_, index) => (
             <PaginationItem key={index}>
               <PaginationLink
@@ -169,14 +186,16 @@ const ProductTable = ({ products, filteredProducts, getStockStatus, setEditingPr
               </PaginationLink>
             </PaginationItem>
           ))}
+          <PaginationItem>
+            <PaginationNext
+              onClick={() =>
+                setCurrentPage((prev) =>
+                  Math.min(prev + 1, Math.ceil(filteredProducts.length / itemsPerPage) - 1)
+                )
+              }
+            />
+          </PaginationItem>
         </PaginationContent>
-        <PaginationNext
-          onClick={() =>
-            setCurrentPage((prev) =>
-              Math.min(prev + 1, Math.ceil(filteredProducts.length / itemsPerPage) - 1)
-            )
-          }
-        />
       </Pagination>
     </div>
   );
