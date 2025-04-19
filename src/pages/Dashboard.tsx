@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { 
   Archive, 
@@ -7,7 +8,7 @@ import {
   BarChart3, 
   ClipboardList
 } from 'lucide-react';
-import { getDashboardStats, getMonthlyTransactions, getLowStockProducts, DashboardStats, MonthlyTransaction, LowStockProduct } from '@/services/api';
+import { getDashboardStats, getMonthlyTransactions, getLowStockProducts } from '@/services/api';
 import StatCard from '@/components/dashboard/StatCard';
 import TransactionsChart from '@/components/dashboard/TransactionsChart';
 import LowStockTable from '@/components/dashboard/LowStockTable';
@@ -43,20 +44,29 @@ const Dashboard = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <div className="animate-pulse text-primary">Loading dashboard data...</div>
+      <div className="h-full flex-1 flex-col space-y-8 p-8 md:flex">
+        <div className="flex items-center justify-between space-y-2">
+          <div>
+            <h2 className="text-2xl font-bold tracking-tight">Dashboard</h2>
+            <p className="text-muted-foreground">Loading dashboard data...</p>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div>
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold">Inventory Dashboard</h1>
-        <p className="text-muted-foreground">Monitor your inventory performance and metrics</p>
+    <div className="h-full flex-1 flex-col space-y-8 p-8 md:flex">
+      <div className="flex items-center justify-between space-y-2">
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight">Dashboard</h2>
+          <p className="text-muted-foreground">
+            Monitor your inventory performance and metrics
+          </p>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats && (
           <>
             <StatCard 
@@ -89,11 +99,11 @@ const Dashboard = () => {
         )}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <TransactionsChart transactions={transactions} />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
           <LowStockTable products={lowStockProducts} />
         </div>
